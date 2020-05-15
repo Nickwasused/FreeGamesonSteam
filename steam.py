@@ -20,17 +20,27 @@ def getfreegames_1():
     return soup2
     
 def returnsteamlink(s):
-    link = s
-    templink = link.replace("/", "")
+    templink = s.replace("/", "")
     appid = templink.replace("app", "")
     return appid
 
 def redeemkey(s):
-    data = {"KeysToRedeem": [finalappid]}
+    data = {"KeysToRedeem": [s]}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
-    redeem = requests.post(url, data=json.dumps(data), headers=headers)
-    print(redeem)
-    print(redeem.text)
+    try:
+        redeem = requests.post(url, data=json.dumps(data), headers=headers)
+        print(redeem)
+        print(redeem.text)
+    except requests.exceptions.ConnectionError:
+        print('Cant connect to Archisteamfarm Api.')
+
+def querygames():
+    soup2 = getfreegames_1()
+    for link in soup2.findAll('a', attrs={'href': re.compile("^/")}):
+        appid = returnsteamlink(link.get('href'))
+        print('Found free Game! App-ID: ' + appid)
+        print('Redeming')
+        redeemkey(appid)
 
 # Config
 bot_name = "PUT_YOU_BOT_NAME_HERE"
@@ -43,10 +53,4 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail appname/appversion'
 }
 
-soup2 = getfreegames_1()
-
-for link in soup2.findAll('a', attrs={'href': re.compile("^/")}):
-    finalappid = returnsteamlink(link.get('href'))
-    print('Found free Game! App-ID: ' + finalappid)
-    print('Redeming')
-    redeemkey(finalappid)
+querygames()
