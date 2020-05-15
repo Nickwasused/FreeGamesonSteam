@@ -11,6 +11,27 @@ import urllib.parse
 import json
 import re
 
+def getfreegames_1():
+    response = requests.get(basedb, headers=headers)
+    soup = BeautifulSoup(response.text, "html.parser")
+    filterapps = soup.findAll("td", {"class": "applogo"})
+    text = '{}'.format(filterapps)
+    soup2 = BeautifulSoup(text, "html.parser")
+    return soup2
+    
+def returnsteamlink(s):
+    link = s
+    templink = link.replace("/", "")
+    appid = templink.replace("app", "")
+    return appid
+
+def redeemkey(s):
+    data = {"KeysToRedeem": [finalappid]}
+    headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+    redeem = requests.post(url, data=json.dumps(data), headers=headers)
+    print(redeem)
+    print(redeem.text)
+
 # Config
 bot_name = "PUT_YOU_BOT_NAME_HERE"
 
@@ -22,24 +43,10 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail appname/appversion'
 }
 
-response = requests.get(basedb, headers=headers)
-soup = BeautifulSoup(response.text, "html.parser")
-
-filterapps = soup.findAll("td", {"class": "applogo"})
-text = '{}'.format(filterapps)
-soup2 = BeautifulSoup(text, "html.parser")
+soup2 = getfreegames_1()
 
 for link in soup2.findAll('a', attrs={'href': re.compile("^/")}):
-    link = link.get('href')
-    templink = link.replace("/", "")
-    finalappid = templink.replace("app", "")
+    finalappid = returnsteamlink(link.get('href'))
     print('Found free Game! App-ID: ' + finalappid)
-    print('Here is the Link: {}'.format(basesteam + finalappid))
     print('Redeming')
-    GG = "{}".format(finalappid)
-    data = {"KeysToRedeem": [GG]}
-    print(data)
-    headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
-    cc = requests.post(url, data=json.dumps(data), headers=headers)
-    print(cc)
-    print(cc.text)
+    redeemkey(finalappid)
