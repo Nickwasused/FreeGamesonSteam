@@ -28,7 +28,7 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 3. Install Dependecies ```  sudo pip3 install beautifulsoup4 ```
 4. Create the Service and timer file:
 	- Path: ``` /etc/systemd/system/steam.service```
-	- Content : ``` 
+	- Content : ```
 				[Unit]
 				Description=Steam service
 				After=network.target
@@ -45,7 +45,7 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 				```
 				
 	- Path: ``` /etc/systemd/system/steam.timer```
-	- Content : ``` 
+	- Content : ```
 				[Unit]
 				Description=Execute Steam
 
