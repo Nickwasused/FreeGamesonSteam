@@ -28,34 +28,37 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 3. Install Dependecies ```  sudo pip3 install beautifulsoup4 ```
 4. Create the Service and timer file:
 	- Path: ``` /etc/systemd/system/steam.service```
-	- Content : ```
-				[Unit]
-				Description=Steam service
-				After=network.target
-				StartLimitIntervalSec=0
+	- Content : 
+	```
+	[Unit]
+	Description=Steam service
+	After=network.target
+	StartLimitIntervalSec=0
 
-				[Service]
-				Type=simple
-				User=pi
-				ExecStart=/usr/bin/python3 /home/pi/steam.py
-				WorkingDirectory=/home/pi/
+	[Service]
+	Type=simple
+	User=pi
+	ExecStart=/usr/bin/python3 /home/pi/steam.py
+	WorkingDirectory=/home/pi/
 
-				[Install]
-				WantedBy=multi-user.target
-				```
+	[Install]
+	WantedBy=multi-user.target
+	```
 				
 	- Path: ``` /etc/systemd/system/steam.timer```
-	- Content : ```
-				[Unit]
-				Description=Execute Steam
+	- Content : 
+	```
+	[Unit]
+	Description=Execute Steam
 
-				[Timer]
-				OnCalendar=*-*-* 0,6,12,18:00:00
-				Unit=steam.service
+	[Timer]
+	OnCalendar=*-*-* 0,6,12,18:00:00
+	Unit=steam.service
 
-				[Install]
-				WantedBy=multi-user.target
-				```
+	[Install]
+	WantedBy=multi-user.target
+	```
+	
 5. Enable and Start the Services:
 	- ``` sudo systemctl enable steam.service ```
 	- ``` sudo systemctl enable steam.timer ```
