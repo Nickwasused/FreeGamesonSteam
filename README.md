@@ -23,9 +23,9 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 
 # Setup for Raspberry-Pi
 
-1. You need ArchiSteamFarm running on 127.0.0.1:1242
+1. You need ArchiSteamFarm running on ``` 127.0.0.1:1242 ```
 2. Download the Script: ``` wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steam.py ```
-3. Install Dependecies ```  sudo pip3 install beautifulsoup4 ```
+3. Install Dependencies ```  sudo pip3 install beautifulsoup4 ```
 4. Create the Service and timer file:
 	- Path: ``` /etc/systemd/system/steam.service```
 	- Content : 
