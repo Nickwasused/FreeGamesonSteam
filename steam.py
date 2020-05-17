@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.1
+# version: 0.3.2
 
 from bs4 import BeautifulSoup
 import steamconfig as config
@@ -43,8 +43,9 @@ def returnappid(s):
     return appid
 
 def test_returnappid():
-    appid = '/app/{}'.format(random.randint(1,1000))
-    assert returnappid(appid) == appid
+    realappid = '{}'.format(random.randint(1,1000))
+    appid = '/app/{}'.format(realappid)
+    assert returnappid(appid) == realappid
 
 def redeemkey(s):
     command = 'addlicense {} {}'.format(config.bot_name, s)
