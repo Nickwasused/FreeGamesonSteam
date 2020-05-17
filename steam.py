@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.2
+# version: 0.3
 
 from bs4 import BeautifulSoup
 import steamconfig as config
@@ -14,13 +14,17 @@ import urllib.parse
 import json
 import re
 
+appids = []
+
 def getfreegames_1():
     response = requests.get(config.basedb, headers=config.headers)
     soup = BeautifulSoup(response.text, "html.parser")
     filterapps = soup.findAll("td", {"class": "applogo"})
     text = '{}'.format(filterapps)
     soup2 = BeautifulSoup(text, "html.parser")
-    return soup2
+    for link in soup2.findAll('a', attrs={'href': re.compile("^/")}):
+        appid = returnappid(link.get('href'))
+        appids.append(appid)
 
 def getfreegames_2():
     response = requests.get(config.basedbpacks, headers=config.headers)
@@ -28,7 +32,9 @@ def getfreegames_2():
     filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
     soup3 = BeautifulSoup(text, "html.parser")
-    return soup3
+    for link in soup3.findAll('a', attrs={'href': re.compile("^/")}):
+        appid = returnappid(link.get('href'))
+        appids.append(appid)
     
 def returnappid(s):
     templink = s.replace("/", "")
@@ -59,16 +65,9 @@ def test_redeemkey():
 def querygames():
     soup2 = getfreegames_1()
     soup3 = getfreegames_2()
-    for link in soup2.findAll('a', attrs={'href': re.compile("^/")}):
-        appid = returnappid(link.get('href'))
-        print('Found free Game! App-ID: ' + appid)
-        print('Redeming')
-        redeemkey(appid)
-
-    for link in soup3.findAll('a', attrs={'href': re.compile("^/")}):
-        appid = returnappid(link.get('href'))
-        print('Found free Game! App-ID: ' + appid)
-        print('Redeming')
+    
+    for appid in appids:
+        print('Redeming: ' + appid)
         redeemkey(appid)
 
 querygames()
