@@ -40,7 +40,7 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 	Type=simple
 	User=pi
 	ExecStart=/usr/bin/python3 /home/pi/steambot/steam.py
-	WorkingDirectory=/home/pi/
+	WorkingDirectory=/home/pi/steambot/
 
 	[Install]
 	WantedBy=multi-user.target
