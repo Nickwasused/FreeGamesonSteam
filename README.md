@@ -24,9 +24,10 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 # Setup for Raspberry-Pi
 
 1. You need ArchiSteamFarm running on ``` 127.0.0.1:1242 ```
-2. Download the Script: ``` wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steam.py ```
-3. Install Dependencies ```  sudo pip3 install beautifulsoup4 ```
-4. Create the Service and timer file:
+2. Make the Directory and change in it: ``` mkdir /home/pi/steambot && cd /home/pi/steambot ```
+3. Download the Script and Config: ``` wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steam.py && wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steamconfig.py```
+4. Install Dependencies ```  sudo pip3 install beautifulsoup4 ```
+5. Create the Service and timer file:
 	- Path: ``` /etc/systemd/system/steam.service```
 	- Content : 
 	```
@@ -38,7 +39,7 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 	[Service]
 	Type=simple
 	User=pi
-	ExecStart=/usr/bin/python3 /home/pi/steam.py
+	ExecStart=/usr/bin/python3 /home/pi/steambot/steam.py
 	WorkingDirectory=/home/pi/
 
 	[Install]
@@ -59,7 +60,7 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 	WantedBy=multi-user.target
 	```
 	
-5. Enable and Start the Services:
+6. Enable and Start the Services:
 	- ``` sudo systemctl enable steam.service ```
 	- ``` sudo systemctl enable steam.timer ```
 	- ``` sudo systemctl start steam.service ```
@@ -67,4 +68,5 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 
 # Notice
 
-The Service assumes that the Script is located here: ``` /home/pi/steam.py ```
+The Service assumes that the Script is located here: ``` /home/pi/steambot/steam.py ```
+And the Service assumes that the Config is located here: ``` /home/pi/steambot/steamconfig.py ```
