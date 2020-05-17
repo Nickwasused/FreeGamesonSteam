@@ -1,4 +1,4 @@
-# FreeGamesonSteam
+# FreeGamesonSteam [![Build Status](https://travis-ci.org/Nickwasused/FreeGamesonSteam.svg?branch=master)](https://travis-ci.org/Nickwasused/FreeGamesonSteam)
 Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
 
 # Important!
