@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
+# version: 0.2
 
 from bs4 import BeautifulSoup
 import steamconfig as config
