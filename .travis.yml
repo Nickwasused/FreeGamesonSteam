@@ -1,11 +1,6 @@
 language: python
 jobs:
   include:
-    - arch:
-        - amd64
-        - ppc64le
-        - s390x
-        - arm64
     - name: "Python on Xenial Linux"
         os: linux
         dist: xenial
