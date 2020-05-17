@@ -23,10 +23,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Please complete the following information:**
+ - OS: [e.g. Linux, Windows, MacOS]
+ - Version
 
 **Additional context**
  - Script Version (Maybe it just needs an update)
