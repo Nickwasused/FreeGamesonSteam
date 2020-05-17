@@ -3,6 +3,7 @@
 # Nickwasused
 
 from bs4 import BeautifulSoup
+import steamconfig as config
 import requests
 import urllib.request
 import time
@@ -12,7 +13,7 @@ import json
 import re
 
 def getfreegames_1():
-    response = requests.get(basedb, headers=headers)
+    response = requests.get(config.basedb, headers=config.headers)
     soup = BeautifulSoup(response.text, "html.parser")
     filterapps = soup.findAll("td", {"class": "applogo"})
     text = '{}'.format(filterapps)
@@ -20,7 +21,7 @@ def getfreegames_1():
     return soup2
 
 def getfreegames_2():
-    response = requests.get(basedbpacks, headers=headers)
+    response = requests.get(config.basedbpacks, headers=config.headers)
     soup = BeautifulSoup(response.text, "html.parser")
     filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
@@ -34,11 +35,11 @@ def returnsteamlink(s):
     return appid
 
 def redeemkey(s):
-    command = 'addlicense {} {}'.format(bot_name, s)
+    command = 'addlicense {} {}'.format(config.bot_name, s)
     data = {"Command": command}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
     try:
-        redeem = requests.post(url, data=json.dumps(data), headers=headers)
+        redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
         print(redeem)
         print(redeem.text)
     except requests.exceptions.ConnectionError:
@@ -58,17 +59,5 @@ def querygames():
         print('Found free Game! App-ID: ' + appid)
         print('Redeming')
         redeemkey(appid)
-
-# Config
-bot_name = "PUT_YOU_BOT_NAME_HERE"
-
-basesteam = 'https://store.steampowered.com/app/'
-basedb = "https://steamdb.info/sales/?min_discount=95&min_rating=0"
-basedbpacks = "https://steamdb.info/upcoming/free/#live-promotions"
-url = "http://127.0.0.1:1242/Api/Command/"
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail appname/appversion'
-}
 
 querygames()
