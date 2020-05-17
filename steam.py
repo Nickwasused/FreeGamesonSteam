@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3
+# version: 0.3.1
 
 from bs4 import BeautifulSoup
 import steamconfig as config
@@ -43,7 +43,7 @@ def returnappid(s):
     return appid
 
 def test_returnappid():
-    appid = '{}'.format(random.randint(1,1000))
+    appid = '/app/{}'.format(random.randint(1,1000))
     assert returnappid(appid) == appid
 
 def redeemkey(s):
