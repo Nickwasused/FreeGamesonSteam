@@ -13,11 +13,12 @@ Put this in your ASF.json:
 
 and
 
-You need to enter your bot name in the script file!
+You need to edit the Config file: ``` nano steamconfig.py ```
 ```
 ...
 # Config
 bot_name = "PUT_YOU_BOT_NAME_HERE"
+boturl = "http://127.0.0.1:1242/Api/Command/"
 ...
 ```
 
@@ -68,5 +69,5 @@ bot_name = "PUT_YOU_BOT_NAME_HERE"
 
 # Notice
 
-The Service assumes that the Script is located here: ``` /home/pi/steambot/steam.py ```
+The Service assumes that the Script is located here: ``` /home/pi/steambot/steam.py ``` <br>
 And the Service assumes that the Config is located here: ``` /home/pi/steambot/steamconfig.py ```
