@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.2
+# version: 0.3.3
 
-from bs4 import BeautifulSoup
-import steamconfig as config
-import requests
-import urllib.request
-import random
-import time
-import os
-import urllib.parse
 import json
+import random
 import re
+import requests
+from bs4 import BeautifulSoup
+
+import steamconfig as config
 
 appids = []
 
@@ -64,8 +61,8 @@ def test_redeemkey():
     assert redeemkey(key) == 'success {}'.format(key)
 
 def querygames():
-    soup2 = getfreegames_1()
-    soup3 = getfreegames_2()
+    getfreegames_1()
+    getfreegames_2()
     
     for appid in appids:
         print('Redeming: ' + appid)
