@@ -27,7 +27,7 @@ boturl = "http://127.0.0.1:1242/Api/Command/"
 1. You need ArchiSteamFarm running on ``` 127.0.0.1:1242 ```
 2. Make the Directory and change in it: ``` mkdir /home/pi/steambot && cd /home/pi/steambot ```
 3. Download the Script and Config: ``` wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steam.py && wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steamconfig.py```
-4. Install Dependencies ```  sudo pip3 install beautifulsoup4 ```
+4. Install Dependencies ```  wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/requirements.txt &&  pip3 install -r requirements.txt ```
 5. Create the Service and timer file:
 	- Path: ``` /etc/systemd/system/steam.service```
 	- Content : 
