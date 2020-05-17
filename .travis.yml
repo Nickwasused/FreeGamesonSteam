@@ -2,6 +2,8 @@ language: python
 jobs:
   include:
     - name: "Python on Xenial Linux"
+    - os: linux
+    - dist: xenial
     - arch:
         - amd64
         - arm64
