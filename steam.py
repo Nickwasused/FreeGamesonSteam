@@ -1,17 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.5
+# version: 0.3.6
 
 import json
 import random
 import re
 import requests
+import ctypes
+import locale
 import steamconfig as config
 from bs4 import BeautifulSoup
+from googletrans import Translator
 
+try:
+    windll = ctypes.windll.kernel32
+    windll.GetUserDefaultUILanguage()
+    lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+    print('Detected Language: ' + lang)
+except:
+    print('Cant detect language using: en_US')
+    lang = 'en_US'
 
 appids = []
+
+
+def translate(text, lang):
+    try:
+        translator = Translator()
+        text = translator.translate(text, dest=lang)
+        return text.text
+    except requests.exceptions.ConnectionError:
+        return text
 
 
 def cleanlist(appids):
@@ -28,22 +48,15 @@ def test_cleanlist():
     assert cleanlist(appids) != appids
 
 
-def getfreegames_1():
-    response = requests.get(config.basedb, headers=config.headers)
+def getfreegames(url):
+    try:
+        response = requests.get(url, headers=config.headers)
+    except requests.exceptions.ConnectionError:
+        print(translate('Cant connect to {}'.format(url), lang))
+        exit()
+
     soup = BeautifulSoup(response.text, "html.parser")
     filterapps = soup.findAll("td", {"class": "applogo"})
-    text = '{}'.format(filterapps)
-    soup = BeautifulSoup(text, "html.parser")
-    for link in soup.findAll('a', attrs={'href': re.compile("^/")}):
-        appid = returnappid(link.get('href'))
-        appids.append(appid)
-    cleanlist(appids)
-
-
-def getfreegames_2():
-    response = requests.get(config.basedbpacks, headers=config.headers)
-    soup = BeautifulSoup(response.text, "html.parser")
-    filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, "html.parser")
     for link in soup.findAll('a', attrs={'href': re.compile("^/")}):
@@ -73,10 +86,10 @@ def redeemkey(s):
         redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
         print(redeem)
     except requests.exceptions.ConnectionError:
-        print('Cant connect to Archisteamfarm Api.')
+        print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
         return 'success ' + s
     except ConnectionRefusedError:
-        print('Cant connect to Archisteamfarm Api.')
+        print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
         return 'success ' + s
 
 
@@ -86,11 +99,11 @@ def test_redeemkey():
 
 
 def querygames():
-    getfreegames_1()
-    getfreegames_2()
+    getfreegames(config.basedb)
+    getfreegames(config.basedbpacks)
 
     for appid in appids:
-        print('Redeming: ' + appid)
+        print(translate('redeeming', lang) + ':  ' + appid)
         redeemkey(appid)
 
 

@@ -1,1 +1,1 @@
-pipreqs
+pipreqs --force
