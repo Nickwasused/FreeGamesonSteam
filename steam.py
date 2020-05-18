@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.6
+# version: 0.3.6.1
 
 import json
 import random
@@ -49,6 +49,7 @@ def test_cleanlist():
 
 
 def getfreegames(url):
+    print(url)
     try:
         response = requests.get(url, headers=config.headers)
     except requests.exceptions.ConnectionError:
@@ -56,13 +57,12 @@ def getfreegames(url):
         exit()
 
     soup = BeautifulSoup(response.text, "html.parser")
-    filterapps = soup.findAll("td", {"class": "applogo"})
+    filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, "html.parser")
     for link in soup.findAll('a', attrs={'href': re.compile("^/")}):
         appid = returnappid(link.get('href'))
         appids.append(appid)
-    cleanlist(appids)
 
 
 def returnappid(s):
@@ -101,6 +101,7 @@ def test_redeemkey():
 def querygames():
     getfreegames(config.basedb)
     getfreegames(config.basedbpacks)
+    cleanlist(appids)
 
     for appid in appids:
         print(translate('redeeming', lang) + ':  ' + appid)
