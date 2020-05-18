@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.3
+# version: 0.3.4
 
 import json
 import random
@@ -13,6 +13,14 @@ import steamconfig as config
 
 appids = []
 
+def cleanlist(appids):
+    appids = list(dict.fromkeys(appids))
+    return appids
+
+def test_cleanlist():
+    appids = ['8888', '7777', '8888']
+    assert cleanlist(appids) != appids
+
 def getfreegames_1():
     response = requests.get(config.basedb, headers=config.headers)
     soup = BeautifulSoup(response.text, "html.parser")
@@ -22,6 +30,7 @@ def getfreegames_1():
     for link in soup2.findAll('a', attrs={'href': re.compile("^/")}):
         appid = returnappid(link.get('href'))
         appids.append(appid)
+    cleanlist(appids)
 
 def getfreegames_2():
     response = requests.get(config.basedbpacks, headers=config.headers)
@@ -32,7 +41,8 @@ def getfreegames_2():
     for link in soup3.findAll('a', attrs={'href': re.compile("^/")}):
         appid = returnappid(link.get('href'))
         appids.append(appid)
-    
+    cleanlist(appids)
+
 def returnappid(s):
     templink = s.replace("/", "")
     templink = templink.replace("sub", "")
