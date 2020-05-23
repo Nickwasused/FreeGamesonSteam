@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.7.1
+# version: 0.3.7.2
 
 import json
 import random
@@ -15,6 +15,7 @@ from googletrans import Translator
 from concurrent.futures import ThreadPoolExecutor
 
 pool = ThreadPoolExecutor(3)
+answerdata = 'success {}'
 
 try:
     windll = ctypes.windll.kernel32
@@ -47,7 +48,7 @@ def cleanlist(appids):
 
 def test_cleanlist():
     appids = []
-    for i in range(5):
+    for _ in range(5):
         number = random.randint(1, 9) + random.randint(1, 9) + random.randint(1, 9)
         appids.append(number)
         appids.append(number)
@@ -91,21 +92,21 @@ def redeemkey(s):
     try:
         redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
         print(redeem)
-        answer = 'success {}'.format(s)
+        answer = answerdata.format(s)
         return answer
     except requests.exceptions.ConnectionError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
-        answer = 'success {}'.format(s)
+        answer = answerdata.format(s)
         return answer
     except ConnectionRefusedError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
-        answer = 'success {}'.format(s)
+        answer = answerdata.format(s)
         return answer
 
 
 def test_redeemkey():
     key = '{}'.format(random.randint(1, 1000))
-    assert redeemkey(key) == 'success {}'.format(key)
+    assert redeemkey(key) == answerdata.format(key)
 
 
 def querygames():
