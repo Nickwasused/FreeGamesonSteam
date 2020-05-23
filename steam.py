@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.6.1
+# version: 0.3.7
 
 import json
 import random
@@ -12,6 +12,9 @@ import locale
 import steamconfig as config
 from bs4 import BeautifulSoup
 from googletrans import Translator
+from concurrent.futures import ThreadPoolExecutor
+
+pool = ThreadPoolExecutor(3)
 
 try:
     windll = ctypes.windll.kernel32
@@ -26,11 +29,14 @@ appids = []
 
 
 def translate(text, lang):
-    try:
-        translator = Translator()
-        text = translator.translate(text, dest=lang)
-        return text.text
-    except requests.exceptions.ConnectionError:
+    if config.translateoutput == "true":
+        try:
+            translator = Translator()
+            text = translator.translate(text, dest=lang)
+            return text.text
+        except requests.exceptions.ConnectionError:
+            return text
+    else:
         return text
 
 
@@ -99,8 +105,9 @@ def test_redeemkey():
 
 
 def querygames():
-    getfreegames(config.basedb)
-    getfreegames(config.basedbpacks)
+    pool.submit(getfreegames(config.basedb))
+    pool.submit(getfreegames(config.basedbpacks))
+
     cleanlist(appids)
 
     for appid in appids:

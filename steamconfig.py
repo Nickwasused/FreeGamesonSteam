@@ -5,6 +5,7 @@
 # Config
 bot_name = "PUT_YOU_BOT_NAME_HERE"
 boturl = "http://127.0.0.1:1242/Api/Command/"
+translateoutput = "true"
 
 #You dont need to change things here:
 basesteam = 'https://store.steampowered.com/app/'
