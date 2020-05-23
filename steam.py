@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.7
+# version: 0.3.7.1
 
 import json
 import random
@@ -21,7 +21,7 @@ try:
     windll.GetUserDefaultUILanguage()
     lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
     print('Detected Language: ' + lang)
-except:
+except AttributeError:
     print('Cant detect language using: en_US')
     lang = 'en_US'
 
@@ -47,7 +47,7 @@ def cleanlist(appids):
 
 def test_cleanlist():
     appids = []
-    for x in range(5):
+    for i in range(5):
         number = random.randint(1, 9) + random.randint(1, 9) + random.randint(1, 9)
         appids.append(number)
         appids.append(number)
@@ -91,12 +91,16 @@ def redeemkey(s):
     try:
         redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
         print(redeem)
+        answer = 'success {}'.format(s)
+        return answer
     except requests.exceptions.ConnectionError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
-        return 'success ' + s
+        answer = 'success {}'.format(s)
+        return answer
     except ConnectionRefusedError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
-        return 'success ' + s
+        answer = 'success {}'.format(s)
+        return answer
 
 
 def test_redeemkey():
