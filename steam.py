@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4
+# version: 0.4.1
 
 import json
 import random
@@ -109,8 +109,9 @@ def redeemkey(bot, s):
 
 
 def test_redeemkey():
+    bot = 'test'
     key = '{}'.format(random.randint(1, 1000))
-    assert redeemkey(key) == answerdata.format(key)
+    assert redeemkey(bot, key) == answerdata.format(key)
 
 
 def redeemhead(bot):
@@ -147,4 +148,3 @@ def querygames():
 querygames()
 database.commit()
 database.close()
-exit()
