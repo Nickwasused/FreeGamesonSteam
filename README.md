@@ -16,9 +16,10 @@ and
 You need to edit the Config file: ``` nano steamconfig.py ```
 ```
 ...
-# Config
-bot_name = "PUT_YOU_BOT_NAME_HERE"
+# Config /Example for Bot (asf) bot_names = ["asf"]
+bot_names = ["PUT_YOU_BOT_NAME_HERE", "PUT_YOU_BOT_NAME_HERE"]
 boturl = "http://127.0.0.1:1242/Api/Command/"
+translateoutput = "true"
 ...
 ```
 
