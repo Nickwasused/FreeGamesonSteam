@@ -72,3 +72,7 @@ translateoutput = "true"
 
 The Service assumes that the Script is located here: ``` /home/pi/steambot/steam.py ``` <br>
 And the Service assumes that the Config is located here: ``` /home/pi/steambot/steamconfig.py ```
+
+# Example Database
+
+[Here](examples/example.md)
