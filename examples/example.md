@@ -5,4 +5,4 @@ Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm
 
 [Here is the Database](example.db)
 
-![database example](example.png)
+![Database Example](example.jpg?raw=true)
