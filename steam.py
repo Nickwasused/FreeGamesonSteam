@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.3.7.2
+# version: 0.4
 
 import json
 import random
@@ -9,12 +9,15 @@ import re
 import requests
 import ctypes
 import locale
+import sqlite3
 import steamconfig as config
 from bs4 import BeautifulSoup
 from googletrans import Translator
 from concurrent.futures import ThreadPoolExecutor
 
 pool = ThreadPoolExecutor(3)
+database = sqlite3.connect("freegames.db")
+cur = database.cursor()
 answerdata = 'success {}'
 
 try:
@@ -85,14 +88,15 @@ def test_returnappid():
     assert returnappid(appid) == realappid
 
 
-def redeemkey(s):
-    command = 'addlicense {} {}'.format(config.bot_name, s)
+def redeemkey(bot, s):
+    command = 'addlicense {} {}'.format(bot, s)
     data = {"Command": command}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
     try:
         redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
         print(redeem)
         answer = answerdata.format(s)
+        database.execute('INSERT INTO {} ("appids") VALUES ("{}")'.format(bot, s))
         return answer
     except requests.exceptions.ConnectionError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
@@ -109,15 +113,38 @@ def test_redeemkey():
     assert redeemkey(key) == answerdata.format(key)
 
 
+def redeemhead(bot):
+    print('Redeeming Keys for Bot:{}'.format(bot))
+    for appid in appids:
+        cur.execute("SELECT appids FROM {} WHERE appids={}".format(bot, appid))
+        result = cur.fetchone()
+        if result:
+            print('Game is already redeemed: {}'.format(appid))
+        else:
+            print(translate('redeeming', lang) + ':  ' + appid)
+            redeemkey(bot, appid)
+
+
+def createbotprofile(bot):
+    try:
+        database.execute('''CREATE TABLE {}
+                 (appids TEXT UNIQUE)'''.format(bot))
+    except sqlite3.OperationalError:
+        pass
+
+
 def querygames():
     pool.submit(getfreegames(config.basedb))
     pool.submit(getfreegames(config.basedbpacks))
 
     cleanlist(appids)
 
-    for appid in appids:
-        print(translate('redeeming', lang) + ':  ' + appid)
-        redeemkey(appid)
+    for _ in config.bot_names:
+        createbotprofile(_)
+        redeemhead(_)
 
 
 querygames()
+database.commit()
+database.close()
+exit()
