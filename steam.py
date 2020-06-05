@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4.1
+# version: 0.4.2
 
 import json
 import random
@@ -19,6 +19,7 @@ pool = ThreadPoolExecutor(3)
 database = sqlite3.connect("freegames.db")
 cur = database.cursor()
 answerdata = 'success {}'
+success = 'success'
 
 try:
     windll = ctypes.windll.kernel32
@@ -116,6 +117,9 @@ def test_redeemkey():
 
 def redeemhead(bot):
     print('Redeeming Keys for Bot:{}'.format(bot))
+    if not appids:
+        print(translate('There are no ids in the list!', lang))
+        return
     for appid in appids:
         cur.execute("SELECT appids FROM {} WHERE appids={}".format(bot, appid))
         result = cur.fetchone()
