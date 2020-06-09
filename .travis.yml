@@ -27,12 +27,11 @@ install:
     - pip3 install -r requirements.txt
     - pip3 install pytest
 
-script:
-    - pytest steam.py
-    - sonar-scanner
-
 addons:
   sonarcloud:
     organization: "nickwasused"
-    token:
-      secure: ${GCE_SECRET_KEY}
+    secure: ${GCE_SECRET_KEY}
+    
+script:
+    - pytest steam.py
+    - sonar-scanner
