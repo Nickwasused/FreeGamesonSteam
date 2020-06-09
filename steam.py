@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4.2
+# version: 0.4.3
 
 import json
+import os
 import random
 import re
 import requests
@@ -20,6 +21,7 @@ database = sqlite3.connect("freegames.db")
 cur = database.cursor()
 answerdata = 'success {}'
 success = 'success'
+os.environ['NO_PROXY'] = config.botip
 
 try:
     windll = ctypes.windll.kernel32
@@ -95,9 +97,12 @@ def redeemkey(bot, s):
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
     try:
         redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
-        print(redeem)
         answer = answerdata.format(s)
-        database.execute('INSERT INTO {} ("appids") VALUES ("{}")'.format(bot, s))
+        if redeem.status_code == 200:
+            database.execute('INSERT INTO {} ("appids") VALUES ("{}")'.format(bot, s))
+        else:
+            print(translate('Cant Reddem code: {} on bot: {}'.format(bot, s), lang))
+
         return answer
     except requests.exceptions.ConnectionError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
