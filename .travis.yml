@@ -31,7 +31,7 @@ addons:
   sonarcloud:
     organization: "nickwasused"
     token:
-        secure: ${GCE_SECRET_KEY}
+        secure: SONAR_TOKEN
     
 script:
     - pytest steam.py
