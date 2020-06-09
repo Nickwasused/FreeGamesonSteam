@@ -31,7 +31,7 @@ addons:
   sonarcloud:
     organization: "nickwasused"
     token:
-        secure: ${{ secrets.SONAR_TOKEN }}
+        secure: SONAR_TOKEN
     
 script:
     - pytest steam.py
