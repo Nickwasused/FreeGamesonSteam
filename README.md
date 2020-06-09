@@ -1,4 +1,8 @@
-# FreeGamesonSteam [![Build Status](https://travis-ci.org/Nickwasused/FreeGamesonSteam.svg?branch=master)](https://travis-ci.org/Nickwasused/FreeGamesonSteam) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Nickwasused_FreeGamesonSteam&metric=alert_status)](https://sonarcloud.io/dashboard?id=Nickwasused_FreeGamesonSteam)
+# FreeGamesonSteam [![Build Status](https://travis-ci.org/Nickwasused/FreeGamesonSteam.svg?branch=master)](https://travis-ci.org/Nickwasused/FreeGamesonSteam) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Nickwasused_FreeGamesonSteam&metric=alert_status)](https://sonarcloud.io/dashboard?id=Nickwasused_FreeGamesonSteam) 
+
+[![codecov](https://codecov.io/gh/Nickwasused/FreeGamesonSteam/branch/master/graph/badge.svg)](https://codecov.io/gh/Nickwasused/FreeGamesonSteam)
+
+
 Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
 
 # Important!
