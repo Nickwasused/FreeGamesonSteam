@@ -29,3 +29,9 @@ install:
 
 script:
     - pytest steam.py
+
+addons:
+  sonarcloud:
+    organization: "nickwasused"
+    token:
+      secure: GCE_SECRET_KEY
