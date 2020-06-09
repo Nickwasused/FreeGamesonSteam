@@ -30,7 +30,8 @@ install:
 addons:
   sonarcloud:
     organization: "nickwasused"
-    secure: ${GCE_SECRET_KEY}
+    token:
+        secure: ${GCE_SECRET_KEY}
     
 script:
     - pytest steam.py
