@@ -30,7 +30,7 @@ install:
     
 script:
     - pytest steam.py
-    - coverage run tests.py
+    - coverage run steam.py
     
 after_success:
   - codecov
