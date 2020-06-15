@@ -5,6 +5,15 @@
 
 Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
 
+# Python Versions
+
+| Version | Supported          |
+| ------- | ------------------ |
+|   0.8   | :white_check_mark: |
+|   0.7   | :white_check_mark: |
+|   3.6   | :white_check_mark: |
+| >=3.5   | :x:                |
+
 # Important!
 You need to enable the IPC interface.
 
