@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4.3
+# version: 0.4.4
 
 import json
 import os
@@ -13,6 +13,7 @@ import locale
 import sqlite3
 import steamconfig as config
 from bs4 import BeautifulSoup
+from datetime import datetime
 from googletrans import Translator
 from concurrent.futures import ThreadPoolExecutor
 
@@ -35,6 +36,24 @@ except AttributeError:
 appids = []
 
 
+def gettime():
+    now = datetime.now()
+    time = now.strftime("%d/%m/%Y %H:%M:%S")
+    return time
+
+
+def logwrite(s):
+    if config.log == 'true':
+        logtime = gettime()
+        log = s
+        with open(config.logfile, 'a+') as logfile:
+            logmessage = '[{}] {}{}'.format(logtime, log, '\n')
+            logfile.write(logmessage)
+        logfile.close()
+    else:
+        pass
+
+
 def translate(text, lang):
     if config.translateoutput == "true":
         try:
@@ -49,6 +68,7 @@ def translate(text, lang):
 
 def cleanlist(appids):
     appids = list(dict.fromkeys(appids))
+    logwrite('Cleaned appids')
     return appids
 
 
@@ -62,9 +82,9 @@ def test_cleanlist():
 
 
 def getfreegames(url):
-    print(url)
     try:
         response = requests.get(url, headers=config.headers)
+        logwrite('Got url: {}'.format(url))
     except requests.exceptions.ConnectionError:
         print(translate('Cant connect to {}'.format(url), lang))
         exit()
@@ -82,6 +102,7 @@ def returnappid(s):
     templink = s.replace("/", "")
     templink = templink.replace("sub", "")
     appid = templink.replace("app", "")
+    logwrite('cleaned appid: {}'.format(appid))
     return appid
 
 
@@ -100,16 +121,19 @@ def redeemkey(bot, s):
         answer = answerdata.format(s)
         if redeem.status_code == 200:
             database.execute('INSERT INTO {} ("appids") VALUES ("{}")'.format(bot, s))
+            logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         else:
             print(translate('Cant Reddem code: {} on bot: {}'.format(bot, s), lang))
-
+            logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
     except requests.exceptions.ConnectionError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
+        logwrite('Cant connect to Archisteamfarm Api. {}'.format(config.boturl))
         answer = answerdata.format(s)
         return answer
     except ConnectionRefusedError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
+        logwrite('Cant connect to Archisteamfarm Api. {}'.format(config.boturl))
         answer = answerdata.format(s)
         return answer
 
@@ -130,6 +154,7 @@ def redeemhead(bot):
         result = cur.fetchone()
         if result:
             print('Game is already redeemed: {}'.format(appid))
+            logwrite('Game already redeemed: {}'.format(appid))
         else:
             print(translate('redeeming', lang) + ':  ' + appid)
             redeemkey(bot, appid)
@@ -156,4 +181,7 @@ def querygames():
 
 querygames()
 database.commit()
+logwrite('commited database')
 database.close()
+logwrite('database closed')
+logwrite('----------------------')

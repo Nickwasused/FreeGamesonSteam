@@ -7,6 +7,8 @@ bot_names = ["PUT_YOU_BOT_NAME_HERE", "PUT_YOU_BOT_NAME_HERE"]
 boturl = "http://127.0.0.1:1242/Api/Command/"
 botip = "127.0.0.1"
 translateoutput = "true"
+log = "true"
+logfile = "freegames.log"
 
 #You dont need to change things here:
 basesteam = 'https://store.steampowered.com/app/'
