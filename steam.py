@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4.4
+# version: 0.4.5
 
 import json
 import os
@@ -11,36 +11,17 @@ import requests
 import ctypes
 import locale
 import sqlite3
+import os.path
 import steamconfig as config
 from bs4 import BeautifulSoup
 from datetime import datetime
 from googletrans import Translator
 from concurrent.futures import ThreadPoolExecutor
 
-pool = ThreadPoolExecutor(3)
-database = sqlite3.connect("freegames.db")
-cur = database.cursor()
-answerdata = 'success {}'
-success = 'success'
-os.environ['NO_PROXY'] = config.botip
-
-try:
-    windll = ctypes.windll.kernel32
-    windll.GetUserDefaultUILanguage()
-    lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
-    print('Detected Language: ' + lang)
-except AttributeError:
-    print('Cant detect language using: en_US')
-    lang = 'en_US'
-
-appids = []
-
-
 def gettime():
     now = datetime.now()
     time = now.strftime("%d/%m/%Y %H:%M:%S")
     return time
-
 
 def logwrite(s):
     if config.log == 'true':
@@ -52,6 +33,27 @@ def logwrite(s):
         logfile.close()
     else:
         pass
+
+pool = ThreadPoolExecutor(3)
+databaselocalfile = 'freegames.db'
+answerdata = 'success {}'
+success = 'success'
+os.environ['NO_PROXY'] = config.botip
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+databasefile = os.path.join(BASE_DIR, databaselocalfile)
+logwrite('Database: {}'.format(databasefile))
+database = sqlite3.connect(databasefile)
+
+try:
+    windll = ctypes.windll.kernel32
+    windll.GetUserDefaultUILanguage()
+    lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+    print('Detected Language: ' + lang)
+except AttributeError:
+    print('Cant detect language using: en_US')
+    lang = 'en_US'
+
+appids = []
 
 
 def translate(text, lang):
@@ -150,6 +152,7 @@ def redeemhead(bot):
         print(translate('There are no ids in the list!', lang))
         return
     for appid in appids:
+        cur = database.cursor()
         cur.execute("SELECT appids FROM {} WHERE appids={}".format(bot, appid))
         result = cur.fetchone()
         if result:
@@ -158,14 +161,25 @@ def redeemhead(bot):
         else:
             print(translate('redeeming', lang) + ':  ' + appid)
             redeemkey(bot, appid)
+        cur.close()
 
 
 def createbotprofile(bot):
-    try:
-        database.execute('''CREATE TABLE {}
-                 (appids TEXT UNIQUE)'''.format(bot))
-    except sqlite3.OperationalError:
+    logwrite('Checking Database for: {}'.format(bot))
+    cur = database.cursor()
+    cur.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{}'".format(bot.replace('\'', '\'\'')))
+    if cur.fetchone()[0] == 1:
+        cur.close()
         pass
+    else:
+        try:
+            database.execute('''CREATE TABLE {}
+                 (appids TEXT UNIQUE)'''.format(bot))
+            database.commit()
+            logwrite('Created Database for Bot: {}'.format(bot))
+        except sqlite3.OperationalError:
+            logwrite('Cant Create Database for: {}'.format(bot))
+            pass
 
 
 def querygames():

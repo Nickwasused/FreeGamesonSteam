@@ -3,7 +3,7 @@
 # Nickwasused
 
 # Config /Example for Bot (asf) bot_names = ["asf"]
-bot_names = ["PUT_YOU_BOT_NAME_HERE", "PUT_YOU_BOT_NAME_HERE"]
+bot_names = ["PUT_YOU_BOT_NAME_HERE_1", "PUT_YOU_BOT_NAME_HERE_2"]
 boturl = "http://127.0.0.1:1242/Api/Command/"
 botip = "127.0.0.1"
 translateoutput = "true"
