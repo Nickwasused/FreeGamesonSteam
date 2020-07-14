@@ -14,6 +14,16 @@ Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm
 |   3.6   | :white_check_mark: |
 | >=3.5   | :x:                |
 
+# Cpu Architecture
+
+|   Arch  | Supported          |
+| ------- | ------------------ |
+|  AMD64  | :white_check_mark: |
+| ppc64le | :white_check_mark: |
+|  s390x  | :white_check_mark: |
+|  Arm64  | :white_check_mark: |
+|  Other  | :x:                |
+
 # Important!
 You need to enable the IPC interface.
 
