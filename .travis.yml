@@ -22,8 +22,9 @@ python:
 
 jobs:
     allow_failures:
-        - python: 
+        - python:
               - "3.5"
+        - python:
               - "nightly"
 
 install:
