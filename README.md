@@ -15,7 +15,7 @@ Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm
 |   3.6   | :white_check_mark: |
 | >=3.5   | :x:                |
 
-# Cpu Architecture
+# Cpu Architectures
 
 |   Arch  | Supported          |
 | ------- | ------------------ |
