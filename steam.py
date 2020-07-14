@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4.5
+# version: 0.4.6
 
 import json
-import os
 import random
 import re
 import requests
@@ -18,10 +17,12 @@ from datetime import datetime
 from googletrans import Translator
 from concurrent.futures import ThreadPoolExecutor
 
+
 def gettime():
     now = datetime.now()
     time = now.strftime("%d/%m/%Y %H:%M:%S")
     return time
+
 
 def logwrite(s):
     if config.log == 'true':
@@ -34,11 +35,11 @@ def logwrite(s):
     else:
         pass
 
+
 pool = ThreadPoolExecutor(3)
 databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
-os.environ['NO_PROXY'] = config.botip
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 databasefile = os.path.join(BASE_DIR, databaselocalfile)
 logwrite('Database: {}'.format(databasefile))
@@ -52,6 +53,15 @@ try:
 except AttributeError:
     print('Cant detect language using: en_US')
     lang = 'en_US'
+
+if config.proxy == "enabled":
+    print('Using Proxy Server if available')
+    logwrite('Using Proxy Server if available')
+    pass
+else:
+    os.environ['NO_PROXY'] = config.botip
+    print('Not using Proxy Servers')
+    logwrite('Not using Proxy Servers')
 
 appids = []
 
@@ -167,7 +177,8 @@ def redeemhead(bot):
 def createbotprofile(bot):
     logwrite('Checking Database for: {}'.format(bot))
     cur = database.cursor()
-    cur.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{}'".format(bot.replace('\'', '\'\'')))
+    cur.execute(
+        "SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{}'".format(bot.replace('\'', '\'\'')))
     if cur.fetchone()[0] == 1:
         cur.close()
         pass
