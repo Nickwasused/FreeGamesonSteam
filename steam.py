@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Nickwasused
-# version: 0.4.6
+# version: 0.4.7
 
 import json
 import random
@@ -132,7 +132,7 @@ def redeemkey(bot, s):
         redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
         answer = answerdata.format(s)
         if redeem.status_code == 200:
-            database.execute('INSERT INTO {} ("appids") VALUES ("{}")'.format(bot, s))
+            database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
             logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         else:
             print(translate('Cant Reddem code: {} on bot: {}'.format(bot, s), lang))
@@ -163,7 +163,7 @@ def redeemhead(bot):
         return
     for appid in appids:
         cur = database.cursor()
-        cur.execute("SELECT appids FROM {} WHERE appids={}".format(bot, appid))
+        cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, appid))
         result = cur.fetchone()
         if result:
             print('Game is already redeemed: {}'.format(appid))
@@ -178,13 +178,13 @@ def createbotprofile(bot):
     logwrite('Checking Database for: {}'.format(bot))
     cur = database.cursor()
     cur.execute(
-        "SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{}'".format(bot.replace('\'', '\'\'')))
+        'SELECT count(name) FROM sqlite_master WHERE type="table" AND name="{}"'.format(bot.replace('\'', '\'\'')))
     if cur.fetchone()[0] == 1:
         cur.close()
         pass
     else:
         try:
-            database.execute('''CREATE TABLE {}
+            database.execute('''CREATE TABLE "{}"
                  (appids TEXT UNIQUE)'''.format(bot))
             database.commit()
             logwrite('Created Database for Bot: {}'.format(bot))
@@ -202,6 +202,8 @@ def querygames():
     for _ in config.bot_names:
         createbotprofile(_)
         redeemhead(_)
+        database.commit()
+        logwrite('commited database')
 
 
 querygames()
