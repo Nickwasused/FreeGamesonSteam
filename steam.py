@@ -28,7 +28,7 @@ import steamconfig as config
 if config.log == 'true':
     logwrite = logwrite_true
 else:
-    logwrite = logwrite_true
+    logwrite = logwrite_false
 
 from concurrent.futures import ThreadPoolExecutor
 
