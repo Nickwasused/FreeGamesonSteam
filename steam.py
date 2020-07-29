@@ -20,7 +20,8 @@ def logwrite_true(s):
     else:
         pass
 
-def logwrite_false(s):
+def logwrite_false():
+    #Do not write log
     pass
 
 import steamconfig as config
