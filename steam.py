@@ -2,28 +2,14 @@
 # -*- coding: utf-8 -*-
 # Nickwasused
 
-import json
-import random
-import re
-import requests
-import ctypes
-import locale
-import sqlite3
-import os.path
-import steamconfig as config
-from bs4 import BeautifulSoup
-from datetime import datetime
-from googletrans import Translator
-from concurrent.futures import ThreadPoolExecutor
-
-
 def gettime():
+    from datetime import datetime
     now = datetime.now()
     time = now.strftime("%d/%m/%Y %H:%M:%S")
     return time
 
 
-def logwrite(s):
+def logwrite_true(s):
     if config.log == 'true':
         logtime = gettime()
         log = s
@@ -34,19 +20,40 @@ def logwrite(s):
     else:
         pass
 
+def logwrite_false(s):
+    pass
+
+import steamconfig as config
+
+if config.log == 'true':
+    logwrite = logwrite_true
+else:
+    logwrite = logwrite_true
+
+from concurrent.futures import ThreadPoolExecutor
 
 pool = ThreadPoolExecutor(3)
 databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
+
+import os.path
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 databasefile = os.path.join(BASE_DIR, databaselocalfile)
 logwrite('Database: {}'.format(databasefile))
+
+import sqlite3
+
 database = sqlite3.connect(databasefile)
 
 try:
+    import ctypes
+
     windll = ctypes.windll.kernel32
     windll.GetUserDefaultUILanguage()
+    import locale
+
     lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
     print('Detected Language: ' + lang)
 except AttributeError:
@@ -66,6 +73,8 @@ appids = []
 
 
 def translate(text, lang):
+    from googletrans import Translator
+    import requests
     if config.translateoutput == "true":
         try:
             translator = Translator()
@@ -84,6 +93,7 @@ def cleanlist(appids):
 
 
 def test_cleanlist():
+    import random
     appids = []
     for _ in range(5):
         number = random.randint(1, 9) + random.randint(1, 9) + random.randint(1, 9)
@@ -93,6 +103,8 @@ def test_cleanlist():
 
 
 def getfreegames(url):
+    import requests
+    from bs4 import BeautifulSoup
     try:
         response = requests.get(url, headers=config.headers)
         logwrite('Got url: {}'.format(url))
@@ -104,6 +116,7 @@ def getfreegames(url):
     filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, "html.parser")
+    import re
     for link in soup.findAll('a', attrs={'href': re.compile("^/")}):
         appid = returnappid(link.get('href'))
         appids.append(appid)
@@ -118,12 +131,15 @@ def returnappid(s):
 
 
 def test_returnappid():
+    import random
     realappid = '{}'.format(random.randint(1, 1000))
     appid = '/app/{}'.format(realappid)
     assert returnappid(appid) == realappid
 
 
 def redeemkey(bot, s):
+    import requests
+    import json
     command = 'addlicense {} {}'.format(bot, s)
     data = {"Command": command}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
@@ -150,6 +166,7 @@ def redeemkey(bot, s):
 
 
 def test_redeemkey():
+    import random
     bot = 'test'
     key = '{}'.format(random.randint(1, 1000))
     assert redeemkey(bot, key) == answerdata.format(key)
