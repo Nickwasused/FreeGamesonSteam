@@ -19,3 +19,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: 'example-*'
+          
+      upload_artifacts:
+        name: Upload Artifacts
+        needs: [create_release]
+        runs-on: ubuntu-latest
+        steps:
+          - name: Upload the artifacts
+            uses: skx/github-action-publish-binaries@release-1.3
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+               releaseId: ${{ needs.create_release.outputs.id }}
+               args: '*.bin'
