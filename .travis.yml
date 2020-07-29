@@ -1,38 +1,40 @@
 language: python
 
+os:
+    - linux
+
+dist: xenial
+
+arch:
+    - amd64
+    - ppc64le
+    - s390x
+    - arm64
+
+cache: 
+    - pip
+    - steamconfig.py
+
+python:
+    - "3.6"
+    - "3.7"
+    - "3.8"
+    - "nightly"
+
 jobs:
-  include:
-    - name: "Linux"
-        os:
-            - linux
-
-        dist: xenial
-
-        arch:
-            - amd64
-            - ppc64le
-            - s390x
-            - arm64
-
-        cache: 
-            - pip
-            - steamconfig.py
-
-        python:
-            - "3.6"
-            - "3.7"
-            - "3.8"
-            - "nightly"
+    allow_failures:
+        - python:
+              "nightly"
 
 install:
-- python3 -m pip install --upgrade pip
-- pip3 install -r requirements.txt
-- pip3 install pytest
-- pip3 install codecov
-            
+    - python3 -m pip install --upgrade pip
+    - pip3 install -r requirements.txt
+    - pip3 install pytest
+    - pip3 install codecov
+    
 script:
-- pytest steam.py
-- coverage run steam.py
+    - pytest steam.py
+    - coverage run steam.py
     
 after_success:
   - codecov
