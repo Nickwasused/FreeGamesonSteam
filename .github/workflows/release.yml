@@ -20,8 +20,8 @@ jobs:
         with:
           args: 'example-*'
           
-      upload_artifacts:
-        name: Upload Artifacts
+
+      - name: Upload Artifacts
         needs: [create_release]
         runs-on: ubuntu-latest
         steps:
