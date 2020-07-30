@@ -53,7 +53,6 @@ import sqlite3
 database = sqlite3.connect(databasefile)
 
 try:
-    from ctypes import windll
     from win32ctypes.core import ctypes
 
     windll = ctypes.windll.kernel32
