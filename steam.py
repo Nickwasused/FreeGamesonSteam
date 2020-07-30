@@ -53,7 +53,7 @@ import sqlite3
 database = sqlite3.connect(databasefile)
 
 try:
-    from win32ctypes.core import ctypes
+    import ctypes
 
     windll = ctypes.windll.kernel32
     windll.GetUserDefaultUILanguage()
