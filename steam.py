@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Nickwasused
 
+
 def gettime():
     from datetime import datetime
     now = datetime.now()
@@ -18,11 +19,14 @@ def logwrite_true(s):
             logfile.write(logmessage)
         logfile.close()
     else:
+        # Do not write log
         pass
 
+
 def logwrite_false():
-    #Do not write log
+    # Do not write log
     pass
+
 
 import steamconfig as config
 
@@ -75,13 +79,13 @@ appids = []
 
 def translate(text, lang):
     from googletrans import Translator
-    import requests
+    from requests import exceptions
     if config.translateoutput == "true":
         try:
             translator = Translator()
             text = translator.translate(text, dest=lang)
             return text.text
-        except requests.exceptions.ConnectionError:
+        except exceptions.ConnectionError:
             return text
     else:
         return text
@@ -94,22 +98,22 @@ def cleanlist(appids):
 
 
 def test_cleanlist():
-    import random
+    from random import randint
     appids = []
     for _ in range(5):
-        number = random.randint(1, 9) + random.randint(1, 9) + random.randint(1, 9)
+        number = randint(1, 9) + randint(1, 9) + randint(1, 9)
         appids.append(number)
         appids.append(number)
     assert cleanlist(appids) != appids
 
 
 def getfreegames(url):
-    import requests
+    from requests import get, exceptions
     from bs4 import BeautifulSoup
     try:
-        response = requests.get(url, headers=config.headers)
+        response = get(url, headers=config.headers)
         logwrite('Got url: {}'.format(url))
-    except requests.exceptions.ConnectionError:
+    except exceptions.ConnectionError:
         print(translate('Cant connect to {}'.format(url), lang))
         exit()
 
@@ -117,8 +121,8 @@ def getfreegames(url):
     filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, "html.parser")
-    import re
-    for link in soup.findAll('a', attrs={'href': re.compile("^/")}):
+    from re import compile
+    for link in soup.findAll('a', attrs={'href': compile("^/")}):
         appid = returnappid(link.get('href'))
         appids.append(appid)
 
@@ -132,20 +136,20 @@ def returnappid(s):
 
 
 def test_returnappid():
-    import random
-    realappid = '{}'.format(random.randint(1, 1000))
+    from random import randint
+    realappid = '{}'.format(randint(1, 1000))
     appid = '/app/{}'.format(realappid)
     assert returnappid(appid) == realappid
 
 
 def redeemkey(bot, s):
-    import requests
-    import json
+    from requests import post, exceptions
+    from json import dumps
     command = 'addlicense {} {}'.format(bot, s)
     data = {"Command": command}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
     try:
-        redeem = requests.post(config.boturl, data=json.dumps(data), headers=headers)
+        redeem = post(config.boturl, data=dumps(data), headers=headers)
         answer = answerdata.format(s)
         if redeem.status_code == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
@@ -154,7 +158,7 @@ def redeemkey(bot, s):
             print(translate('Cant Reddem code: {} on bot: {}'.format(bot, s), lang))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
-    except requests.exceptions.ConnectionError:
+    except exceptions.ConnectionError:
         print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
         logwrite('Cant connect to Archisteamfarm Api. {}'.format(config.boturl))
         answer = answerdata.format(s)
@@ -167,9 +171,9 @@ def redeemkey(bot, s):
 
 
 def test_redeemkey():
-    import random
+    from random import randint
     bot = 'test'
-    key = '{}'.format(random.randint(1, 1000))
+    key = '{}'.format(randint(1, 1000))
     assert redeemkey(bot, key) == answerdata.format(key)
 
 
