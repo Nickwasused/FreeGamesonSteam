@@ -36,8 +36,9 @@ else:
     logwrite = logwrite_false
 
 from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import cpu_count
 
-pool = ThreadPoolExecutor(3)
+pool = ThreadPoolExecutor(cpu_count())
 databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
