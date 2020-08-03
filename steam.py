@@ -36,8 +36,9 @@ else:
     logwrite = logwrite_false
 
 from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import cpu_count
 
-pool = ThreadPoolExecutor(3)
+pool = ThreadPoolExecutor(cpu_count())
 databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
@@ -154,6 +155,20 @@ def redeemkey(bot, s):
         if redeem.status_code == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
             logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
+        elif redeem.status_code == 400:
+            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request.text))
+        elif redeem.status_code == 401:
+            print('Wrong IPC password/auth faliure')
+            logwrite('Wrong IPC password/auth faliure')
+        elif redeem.status_code == 403:
+            print('Blocked by asf try again in a few hours')
+            logwrite('Blocked by asf try again in a few hours')
+        elif redeem.status_code == 500:
+            print('unexpected error while redeeming appid: {}'.format(s))
+            logwrite('unexpected error while redeeming appid: {}'.format(s))
+        elif redeem.status_code == 503:
+            print('third-party resource error while redeeming appid: {}'.format(s))
+            logwrite('third-party resource error while redeeming appid: {}'.format(s))
         else:
             print(translate('Cant Reddem code: {} on bot: {}'.format(bot, s), lang))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
