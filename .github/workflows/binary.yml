@@ -25,6 +25,7 @@ jobs:
         python-version: '3.8'
 
     - name: Dependencies
+      working-directory: app
       run: pip3 install --upgrade
         pyinstaller
         requests
