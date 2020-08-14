@@ -25,13 +25,11 @@ jobs:
         python-version: '3.8'
 
     - name: Dependencies
-      working-directory: app
       run: pip3 install --upgrade
         pyinstaller
         requests
         setuptools
         wheel
-        pip3 install -r requirements.txt
 
     - name: Build
       working-directory: app
