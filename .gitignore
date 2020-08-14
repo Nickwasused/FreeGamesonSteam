@@ -2,6 +2,9 @@
 .idea
 freegames.db
 freegames.log
+app/__pycache__
+app/build
+app/dist
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

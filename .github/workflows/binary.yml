@@ -40,9 +40,8 @@ jobs:
       run: pyinstaller
         --onefile
         --name FreeGamesonSteam
-        --add-data steamconfig.py
         ${{ steps.strip.outputs.option }}
-        steam.py
+        FreeGamesonSteam.spec
 
     - uses: actions/upload-artifact@v2
       with:
