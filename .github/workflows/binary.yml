@@ -38,8 +38,6 @@ jobs:
     - name: Build
       working-directory: app
       run: pyinstaller
-        --onefile
-        --name FreeGamesonSteam
         ${{ steps.strip.outputs.option }}
         FreeGamesonSteam.spec
 
