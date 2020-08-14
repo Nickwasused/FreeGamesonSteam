@@ -30,19 +30,14 @@ jobs:
         requests
         setuptools
         wheel
-
-    - name: Strip
-      id: strip
-      run: echo ::set-output name=option::--strip
-      if: runner.os != 'Windows'
+      pip3 install -r requirements.txt
 
     - name: Build
       working-directory: app
       run: pyinstaller
-        ${{ steps.strip.outputs.option }}
         FreeGamesonSteam.spec
 
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ runner.os }}-package
+        name: ${{ runner.os }}
         path: app/dist/*
