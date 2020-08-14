@@ -30,7 +30,7 @@ jobs:
         requests
         setuptools
         wheel
-      pip3 install -r requirements.txt
+        pip3 install -r requirements.txt
 
     - name: Build
       working-directory: app
