@@ -125,9 +125,10 @@ def getfreegames(url):
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, "html.parser")
     from re import compile
-    for link in soup.findAll('a', attrs={'href': compile("^/")}):
-        appid = returnappid(link.get('href'))
-        appidfinder = compile("^[0-9]{6}$")
+    appidfinder = compile("^[0-9]{6}$")
+    link = compile("^/")
+    for _ in soup.findAll('a', attrs={'href': link}):
+        appid = returnappid(_.get('href'))
         appid = appidfinder.match(appid)
         if appid:
             appids.append(appid.string)
