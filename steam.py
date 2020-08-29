@@ -88,6 +88,8 @@ def translate(text, lang):
             return text.text
         except exceptions.ConnectionError:
             return text
+        except:
+            return text
     else:
         return text
 
@@ -125,7 +127,12 @@ def getfreegames(url):
     from re import compile
     for link in soup.findAll('a', attrs={'href': compile("^/")}):
         appid = returnappid(link.get('href'))
-        appids.append(appid)
+        appidfinder = compile("^[0-9]{6}$")
+        appid = appidfinder.match(appid)
+        if appid:
+            appids.append(appid.string)
+        else:
+            break
 
 
 def returnappid(s):
