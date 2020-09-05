@@ -115,16 +115,6 @@ def cleanlist(appids):
     return appids
 
 
-def test_cleanlist():
-    from random import randint
-    appids = []
-    for _ in range(5):
-        number = randint(1, 9) + randint(1, 9) + randint(1, 9)
-        appids.append(number)
-        appids.append(number)
-    assert cleanlist(appids) != appids
-
-
 def getfreegames(url):
     from requests import get, exceptions
     from bs4 import BeautifulSoup
@@ -160,13 +150,6 @@ def returnappid(s):
     appid = templink.replace("app", "")
     logwrite('cleaned appid: {}'.format(appid))
     return appid
-
-
-def test_returnappid():
-    from random import randint
-    realappid = '{}'.format(randint(1, 1000))
-    appid = '/app/{}'.format(realappid)
-    assert returnappid(appid) == realappid
 
 
 def redeemkey(bot, s):
@@ -212,14 +195,6 @@ def redeemkey(bot, s):
 
     umodules = ['post', 'exceptions', 'dumps']
     map(unloader, umodules)
-
-
-def test_redeemkey():
-    from random import randint
-    bot = 'test'
-    key = '{}'.format(randint(1, 1000))
-    assert redeemkey(bot, key) == answerdata.format(key)
-
 
 def redeemhead(bot):
     print('Redeeming Keys for Bot:{}'.format(bot))
