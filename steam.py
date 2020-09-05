@@ -2,6 +2,16 @@
 # -*- coding: utf-8 -*-
 # Nickwasused
 
+import sys
+
+if not sys.version_info > (3, 6):
+    print('You need to use Python 3.6 or above')
+    exit()
+
+
+def unloader(s):
+    del sys.modules[s]
+
 
 def gettime():
     from datetime import datetime
@@ -48,6 +58,7 @@ import os.path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 databasefile = os.path.join(BASE_DIR, databaselocalfile)
 logwrite('Database: {}'.format(databasefile))
+unloader('os')
 
 import sqlite3
 
@@ -66,6 +77,8 @@ except AttributeError:
     print('Cant detect language using: en_US')
     lang = 'en_US'
 
+unloader('ctypes')
+
 if config.proxy == "enabled":
     print('Using Proxy Server if available')
     logwrite('Using Proxy Server if available')
@@ -79,9 +92,9 @@ appids = []
 
 
 def translate(text, lang):
-    from googletrans import Translator
-    from requests import exceptions
     if config.translateoutput == "true":
+        from googletrans import Translator
+        from requests import exceptions
         try:
             translator = Translator()
             text = translator.translate(text, dest=lang)
@@ -90,6 +103,8 @@ def translate(text, lang):
             return text
         except:
             return text
+        umodules = ["Translator", "exceptions"]
+        map(unloader, umodules)
     else:
         return text
 
@@ -115,12 +130,13 @@ def getfreegames(url):
     from bs4 import BeautifulSoup
     try:
         response = get(url, headers=config.headers)
+        response = response.text
         logwrite('Got url: {}'.format(url))
     except exceptions.ConnectionError:
         print(translate('Cant connect to {}'.format(url), lang))
         exit()
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response, "html.parser")
     filterapps = soup.findAll("td")
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, "html.parser")
@@ -134,6 +150,8 @@ def getfreegames(url):
             appids.append(appid.string)
         else:
             break
+    umodules = ["get", "exceptions", "BeautifulSoup"]
+    map(unloader, umodules)
 
 
 def returnappid(s):
@@ -164,7 +182,7 @@ def redeemkey(bot, s):
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
             logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         elif redeem.status_code == 400:
-            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request.text))
+            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request))
         elif redeem.status_code == 401:
             print('Wrong IPC password/auth faliure')
             logwrite('Wrong IPC password/auth faliure')
@@ -192,6 +210,9 @@ def redeemkey(bot, s):
         answer = answerdata.format(s)
         return answer
 
+    umodules = ['post', 'exceptions', 'dumps']
+    map(unloader, umodules)
+
 
 def test_redeemkey():
     from random import randint
@@ -205,16 +226,16 @@ def redeemhead(bot):
     if not appids:
         print(translate('There are no ids in the list!', lang))
         return
-    for appid in appids:
+    for _ in appids:
         cur = database.cursor()
-        cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, appid))
+        cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, _))
         result = cur.fetchone()
         if result:
-            print('Game is already redeemed: {}'.format(appid))
-            logwrite('Game already redeemed: {}'.format(appid))
+            print('Game is already redeemed: {}'.format(_))
+            logwrite('Game already redeemed: {}'.format(_))
         else:
-            print(translate('redeeming', lang) + ':  ' + appid)
-            redeemkey(bot, appid)
+            print(translate('redeeming', lang) + ':  ' + _)
+            redeemkey(bot, _)
         cur.close()
 
 
