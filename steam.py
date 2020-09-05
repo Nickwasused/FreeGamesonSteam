@@ -103,10 +103,11 @@ def translate(text, lang):
             return text
         except:
             return text
-        umodules = ["Translator", "exceptions"]
-        map(unloader, umodules)
     else:
         return text
+
+    umodules = ["Translator", "exceptions"]
+    map(unloader, umodules)
 
 
 def cleanlist(appids):
