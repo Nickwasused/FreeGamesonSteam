@@ -82,7 +82,6 @@ unloader('ctypes')
 if config.proxy == "enabled":
     print('Using Proxy Server if available')
     logwrite('Using Proxy Server if available')
-    pass
 else:
     os.environ['NO_PROXY'] = config.botip
     print('Not using Proxy Servers')
@@ -103,8 +102,7 @@ def translate(text, lang):
             return text
         except:
             return text
-    else:
-        return text
+    return text
 
     umodules = ["Translator", "exceptions"]
     map(unloader, umodules)
@@ -154,6 +152,7 @@ def returnappid(s):
 
 
 def redeemkey(bot, s):
+    emessage = 'Cant connect to Archisteamfarm Api. {}'
     from requests import post, exceptions
     from json import dumps
     command = 'addlicense {} {}'.format(bot, s)
@@ -184,13 +183,13 @@ def redeemkey(bot, s):
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
     except exceptions.ConnectionError:
-        print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
-        logwrite('Cant connect to Archisteamfarm Api. {}'.format(config.boturl))
+        print(translate(emessage.format(config.boturl), lang))
+        logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
     except ConnectionRefusedError:
-        print(translate('Cant connect to Archisteamfarm Api. {}'.format(config.boturl), lang))
-        logwrite('Cant connect to Archisteamfarm Api. {}'.format(config.boturl))
+        print(translate(emessage.format(config.boturl), lang))
+        logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
 
@@ -222,7 +221,6 @@ def createbotprofile(bot):
         'SELECT count(name) FROM sqlite_master WHERE type="table" AND name="{}"'.format(bot.replace('\'', '\'\'')))
     if cur.fetchone()[0] == 1:
         cur.close()
-        pass
     else:
         try:
             database.execute('''CREATE TABLE "{}"
@@ -231,7 +229,6 @@ def createbotprofile(bot):
             logwrite('Created Database for Bot: {}'.format(bot))
         except sqlite3.OperationalError:
             logwrite('Cant Create Database for: {}'.format(bot))
-            pass
 
 
 def querygames():
