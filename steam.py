@@ -8,37 +8,37 @@ if not sys.version_info > (3, 6):
     print('You need to use Python 3.6 or above')
     exit()
 
-
-def unloader(s):
-    del sys.modules[s]
+from steamconfig import config
 
 
 def gettime():
     from datetime import datetime
     now = datetime.now()
-    time = now.strftime("%d/%m/%Y %H:%M:%S")
+    time = now.strftime('%d/%m/%Y %H:%M:%S')
     return time
 
 
-def logwrite_true(s):
-    if config.log == 'true':
-        logtime = gettime()
-        log = s
-        with open(config.logfile, 'a+') as logfile:
-            logmessage = '[{}] {}{}'.format(logtime, log, '\n')
-            logfile.write(logmessage)
-        logfile.close()
-    else:
-        # Do not write log
-        pass
+logtemp = []
+
+
+def logwrite_true(_):
+    logtime = gettime()
+    log = _
+    logmessage = '[{}] {}{}'.format(logtime, log, '\n')
+    logtemp.append(logmessage)
+
+
+def logwrite_to_file():
+    with open(config.logfile, 'a+') as logfile:
+        for _ in logtemp:
+            logfile.write(_)
+    logfile.close()
 
 
 def logwrite_false():
     # Do not write log
     pass
 
-
-import steamconfig as config
 
 if config.log == 'true':
     logwrite = logwrite_true
@@ -53,12 +53,18 @@ databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
 
-import os.path
+import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 databasefile = os.path.join(BASE_DIR, databaselocalfile)
 logwrite('Database: {}'.format(databasefile))
-unloader('os')
+
+if os.path.exists(config.logfile):
+    os.remove(config.logfile)
+else:
+    # Nothing to remove
+    pass
+
 
 import sqlite3
 
@@ -77,7 +83,6 @@ except AttributeError:
     print('Cant detect language using: en_US')
     lang = 'en_US'
 
-unloader('ctypes')
 
 if config.proxy == "enabled":
     print('Using Proxy Server if available')
@@ -91,19 +96,16 @@ appids = []
 
 
 def translate(text, lang):
-    if config.translateoutput == "true":
-        from googletrans import Translator
+    if config.translateoutput == 'true':
+        import googletrans
         from requests import exceptions
         try:
-            translator = Translator()
+            translator = googletrans.Translator()
             text = translator.translate(text, dest=lang)
             return text.text
         except exceptions.ConnectionError:
             return text
     return text
-
-    umodules = ["Translator", "exceptions"]
-    map(unloader, umodules)
 
 
 def cleanlist(appids):
@@ -112,7 +114,8 @@ def cleanlist(appids):
     return appids
 
 
-def getfreegames(url):
+def getfreegames(s):
+    url = s
     from requests import get, exceptions
     from bs4 import BeautifulSoup
     try:
@@ -123,13 +126,13 @@ def getfreegames(url):
         print(translate('Cant connect to {}'.format(url), lang))
         exit()
 
-    soup = BeautifulSoup(response, "html.parser")
-    filterapps = soup.findAll("td")
+    soup = BeautifulSoup(response, 'html.parser')
+    filterapps = soup.findAll('td')
     text = '{}'.format(filterapps)
-    soup = BeautifulSoup(text, "html.parser")
+    soup = BeautifulSoup(text, 'html.parser')
     from re import compile
-    appidfinder = compile("^[0-9]{6}$")
-    link = compile("^/")
+    appidfinder = compile('^[0-9]{6}$')
+    link = compile('^/')
     for _ in soup.findAll('a', attrs={'href': link}):
         appid = returnappid(_.get('href'))
         appid = appidfinder.match(appid)
@@ -137,14 +140,12 @@ def getfreegames(url):
             appids.append(appid.string)
         else:
             break
-    umodules = ["get", "exceptions", "BeautifulSoup"]
-    map(unloader, umodules)
 
 
 def returnappid(s):
-    templink = s.replace("/", "")
-    templink = templink.replace("sub", "")
-    appid = templink.replace("app", "")
+    templink = s.replace('/', '')
+    templink = templink.replace('sub', '')
+    appid = templink.replace('app', '')
     logwrite('cleaned appid: {}'.format(appid))
     return appid
 
@@ -154,10 +155,10 @@ def redeemkey(bot, s):
     from requests import post, exceptions
     from json import dumps
     command = 'addlicense {} {}'.format(bot, s)
-    data = {"Command": command}
+    data = {'Command': command}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
     try:
-        redeem = post(config.boturl, data=dumps(data), headers=headers)
+        redeem = post(config.boturl, data=dumps(data), headers=headers, timeout=config.timeout)
         answer = answerdata.format(s)
         if redeem.status_code == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
@@ -191,8 +192,6 @@ def redeemkey(bot, s):
         answer = answerdata.format(s)
         return answer
 
-    umodules = ['post', 'exceptions', 'dumps']
-    map(unloader, umodules)
 
 def redeemhead(bot):
     print('Redeeming Keys for Bot:{}'.format(bot))
@@ -230,8 +229,8 @@ def createbotprofile(bot):
 
 
 def querygames():
-    pool.submit(getfreegames(config.basedb))
-    pool.submit(getfreegames(config.basedbpacks))
+    for _ in config.links:
+        pool.submit(getfreegames(_))
 
     cleanlist(appids)
 
@@ -248,3 +247,4 @@ logwrite('commited database')
 database.close()
 logwrite('database closed')
 logwrite('----------------------')
+logwrite_to_file()
