@@ -33,5 +33,4 @@ install:
     - pip3 install codecov
     
 script:
-    - pytest steam.py
     - coverage run steam.py
