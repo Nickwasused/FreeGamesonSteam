@@ -53,11 +53,18 @@ databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
 
-import os.path
+import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 databasefile = os.path.join(BASE_DIR, databaselocalfile)
 logwrite('Database: {}'.format(databasefile))
+
+if os.path.exists(config.logfile):
+    os.remove(config.logfile)
+else:
+    # Nothing to remove
+    pass
+
 
 import sqlite3
 
