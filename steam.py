@@ -217,7 +217,7 @@ def redeemhead(bot):
             print(translate('redeeming', lang) + ':  ' + _)
             redeemkey(bot, _)
         cur.close()
-    unloader(['requests', 'json'])
+    unloader(['json'])
 
 
 def createbotprofile(bot):
