@@ -100,8 +100,6 @@ def translate(text, lang):
             return text.text
         except exceptions.ConnectionError:
             return text
-        except:
-            return text
     return text
 
     umodules = ["Translator", "exceptions"]
