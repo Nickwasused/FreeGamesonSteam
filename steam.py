@@ -11,19 +11,10 @@ if not sys.version_info > (3, 6):
 from steamconfig import config
 
 
-def unloader(_):
-    for _ in _:
-        try:
-            del sys.modules[_]
-        except KeyError:
-            pass
-
-
 def gettime():
     from datetime import datetime
     now = datetime.now()
     time = now.strftime('%d/%m/%Y %H:%M:%S')
-    unloader(['datetime'])
     return time
 
 
@@ -67,7 +58,6 @@ import os.path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 databasefile = os.path.join(BASE_DIR, databaselocalfile)
 logwrite('Database: {}'.format(databasefile))
-unloader(['os'])
 
 import sqlite3
 
@@ -86,7 +76,6 @@ except AttributeError:
     print('Cant detect language using: en_US')
     lang = 'en_US'
 
-unloader(['ctypes'])
 
 if config.proxy == "enabled":
     print('Using Proxy Server if available')
@@ -106,12 +95,9 @@ def translate(text, lang):
         try:
             translator = googletrans.Translator()
             text = translator.translate(text, dest=lang)
-            unloader(['googletrans'])
             return text.text
         except exceptions.ConnectionError:
-            unloader(['googletrans'])
             return text
-    unloader(['googletrans'])
     return text
 
 
@@ -147,7 +133,6 @@ def getfreegames(s):
             appids.append(appid.string)
         else:
             break
-    unloader(['re', 'bs4'])
 
 
 def returnappid(s):
@@ -217,7 +202,6 @@ def redeemhead(bot):
             print(translate('redeeming', lang) + ':  ' + _)
             redeemkey(bot, _)
         cur.close()
-    unloader(['json'])
 
 
 def createbotprofile(bot):
@@ -240,7 +224,6 @@ def createbotprofile(bot):
 def querygames():
     for _ in config.links:
         pool.submit(getfreegames(_))
-    unloader(['concurrent.futures', 'multiprocessing'])
 
     cleanlist(appids)
 
@@ -255,7 +238,6 @@ querygames()
 database.commit()
 logwrite('commited database')
 database.close()
-unloader(['sqlite3', 'steamconfig'])
 logwrite('database closed')
 logwrite('----------------------')
 logwrite_to_file()
