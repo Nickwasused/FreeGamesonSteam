@@ -13,19 +13,14 @@ from steamconfig import config
 
 def gettime():
     from datetime import datetime
-    now = datetime.now()
-    time = now.strftime('%d/%m/%Y %H:%M:%S')
-    return time
+    return datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
 
 logtemp = []
 
 
 def logwrite_true(_):
-    logtime = gettime()
-    log = _
-    logmessage = '[{}] {}{}'.format(logtime, log, '\n')
-    logtemp.append(logmessage)
+    logtemp.append('[{}] {}{}'.format(gettime(), _, '\n'))
 
 
 def logwrite_to_file():
@@ -100,8 +95,7 @@ def translate(text, lang):
         import googletrans
         from requests import exceptions
         try:
-            translator = googletrans.Translator()
-            text = translator.translate(text, dest=lang)
+            text = googletrans.Translator().translate(text, dest=lang)
             return text.text
         except exceptions.ConnectionError:
             return text
@@ -154,11 +148,9 @@ def redeemkey(bot, s):
     emessage = 'Cant connect to Archisteamfarm Api. {}'
     from requests import post, exceptions
     from json import dumps
-    command = 'addlicense {} {}'.format(bot, s)
-    data = {'Command': command}
-    headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+    data = {'Command': 'addlicense {} {}'.format(bot, s)}
     try:
-        redeem = post(config.boturl, data=dumps(data), headers=headers, timeout=config.timeout)
+        redeem = post(config.boturl, data=dumps(data), headers={'accept': 'application/json', 'Content-Type': 'application/json'}, timeout=config.timeout)
         answer = answerdata.format(s)
         if redeem.status_code == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
