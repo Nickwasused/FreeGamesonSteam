@@ -13,13 +13,16 @@ from steamconfig import config
 
 def unloader(_):
     for _ in _:
-        del sys.modules[_]
+        try:
+            del sys.modules[_]
+        except KeyError:
+            pass
 
 
 def gettime():
     from datetime import datetime
     now = datetime.now()
-    time = now.strftime("%d/%m/%Y %H:%M:%S")
+    time = now.strftime('%d/%m/%Y %H:%M:%S')
     unloader(['datetime'])
     return time
 
@@ -97,18 +100,18 @@ appids = []
 
 
 def translate(text, lang):
-    if config.translateoutput == "true":
+    if config.translateoutput == 'true':
         import googletrans
         from requests import exceptions
         try:
             translator = googletrans.Translator()
             text = translator.translate(text, dest=lang)
-            unloader(["googletrans"])
+            unloader(['googletrans'])
             return text.text
         except exceptions.ConnectionError:
-            unloader(["googletrans"])
+            unloader(['googletrans'])
             return text
-    unloader(["googletrans"])
+    unloader(['googletrans'])
     return text
 
 
@@ -130,13 +133,13 @@ def getfreegames(s):
         print(translate('Cant connect to {}'.format(url), lang))
         exit()
 
-    soup = BeautifulSoup(response, "html.parser")
-    filterapps = soup.findAll("td")
+    soup = BeautifulSoup(response, 'html.parser')
+    filterapps = soup.findAll('td')
     text = '{}'.format(filterapps)
-    soup = BeautifulSoup(text, "html.parser")
+    soup = BeautifulSoup(text, 'html.parser')
     from re import compile
     appidfinder = compile('^[0-9]{6}$')
-    link = compile("^/")
+    link = compile('^/')
     for _ in soup.findAll('a', attrs={'href': link}):
         appid = returnappid(_.get('href'))
         appid = appidfinder.match(appid)
@@ -144,13 +147,13 @@ def getfreegames(s):
             appids.append(appid.string)
         else:
             break
-    unloader(["requests", "bs4"])
+    unloader(['re', 'bs4'])
 
 
 def returnappid(s):
-    templink = s.replace("/", "")
-    templink = templink.replace("sub", "")
-    appid = templink.replace("app", "")
+    templink = s.replace('/', '')
+    templink = templink.replace('sub', '')
+    appid = templink.replace('app', '')
     logwrite('cleaned appid: {}'.format(appid))
     return appid
 
@@ -160,7 +163,7 @@ def redeemkey(bot, s):
     from requests import post, exceptions
     from json import dumps
     command = 'addlicense {} {}'.format(bot, s)
-    data = {"Command": command}
+    data = {'Command': command}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
     try:
         redeem = post(config.boturl, data=dumps(data), headers=headers, timeout=config.timeout)
