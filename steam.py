@@ -13,19 +13,14 @@ from steamconfig import config
 
 def gettime():
     from datetime import datetime
-    now = datetime.now()
-    time = now.strftime('%d/%m/%Y %H:%M:%S')
-    return time
+    return datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
 
 logtemp = []
 
 
 def logwrite_true(_):
-    logtime = gettime()
-    log = _
-    logmessage = '[{}] {}{}'.format(logtime, log, '\n')
-    logtemp.append(logmessage)
+    logtemp.append('[{}] {}{}'.format(gettime(), _, '\n'))
 
 
 def logwrite_to_file():
@@ -65,24 +60,9 @@ else:
     # Nothing to remove
     pass
 
-
 import sqlite3
 
 database = sqlite3.connect(databasefile)
-
-try:
-    import ctypes
-
-    windll = ctypes.windll.kernel32
-    windll.GetUserDefaultUILanguage()
-    import locale
-
-    lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
-    print('Detected Language: ' + lang)
-except AttributeError:
-    print('Cant detect language using: en_US')
-    lang = 'en_US'
-
 
 if config.proxy == "enabled":
     print('Using Proxy Server if available')
@@ -95,19 +75,6 @@ else:
 appids = []
 
 
-def translate(text, lang):
-    if config.translateoutput == 'true':
-        import googletrans
-        from requests import exceptions
-        try:
-            translator = googletrans.Translator()
-            text = translator.translate(text, dest=lang)
-            return text.text
-        except exceptions.ConnectionError:
-            return text
-    return text
-
-
 def cleanlist(appids):
     appids = list(dict.fromkeys(appids))
     logwrite('Cleaned appids')
@@ -116,14 +83,15 @@ def cleanlist(appids):
 
 def getfreegames(s):
     url = s
-    from requests import get, exceptions
+    from urllib3 import PoolManager, exceptions
     from bs4 import BeautifulSoup
+    import certifi
     try:
-        response = get(url, headers=config.headers)
-        response = response.text
+        https = PoolManager(ca_certs=certifi.where())
+        response = https.request('GET', url, headers=config.headers).data.decode('utf-8')
         logwrite('Got url: {}'.format(url))
     except exceptions.ConnectionError:
-        print(translate('Cant connect to {}'.format(url), lang))
+        print('Cant connect to {}'.format(url))
         exit()
 
     soup = BeautifulSoup(response, 'html.parser')
@@ -152,42 +120,43 @@ def returnappid(s):
 
 def redeemkey(bot, s):
     emessage = 'Cant connect to Archisteamfarm Api. {}'
-    from requests import post, exceptions
+    from urllib3 import PoolManager, exceptions
     from json import dumps
-    command = 'addlicense {} {}'.format(bot, s)
-    data = {'Command': command}
-    headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+    http = PoolManager()
+    data = {'Command': 'addlicense {} {}'.format(bot, s)}
     try:
-        redeem = post(config.boturl, data=dumps(data), headers=headers, timeout=config.timeout)
+        redeem = http.request('POST', config.boturl, body=dumps(data),
+                              headers={'accept': 'application/json', 'Content-Type': 'application/json'},
+                              timeout=config.timeout)
         answer = answerdata.format(s)
-        if redeem.status_code == 200:
+        if redeem.status == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
             logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
-        elif redeem.status_code == 400:
+        elif redeem.status == 400:
             logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request))
-        elif redeem.status_code == 401:
+        elif redeem.status == 401:
             print('Wrong IPC password/auth faliure')
             logwrite('Wrong IPC password/auth faliure')
-        elif redeem.status_code == 403:
+        elif redeem.status == 403:
             print('Blocked by asf try again in a few hours')
             logwrite('Blocked by asf try again in a few hours')
-        elif redeem.status_code == 500:
+        elif redeem.status == 500:
             print('unexpected error while redeeming appid: {}'.format(s))
             logwrite('unexpected error while redeeming appid: {}'.format(s))
-        elif redeem.status_code == 503:
+        elif redeem.status == 503:
             print('third-party resource error while redeeming appid: {}'.format(s))
             logwrite('third-party resource error while redeeming appid: {}'.format(s))
         else:
-            print(translate('Cant Reddem code: {} on bot: {}'.format(bot, s), lang))
+            print('Cant Reddem code: {} on bot: {}'.format(bot, s))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
     except exceptions.ConnectionError:
-        print(translate(emessage.format(config.boturl), lang))
+        print(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
     except ConnectionRefusedError:
-        print(translate(emessage.format(config.boturl), lang))
+        print(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
@@ -196,7 +165,7 @@ def redeemkey(bot, s):
 def redeemhead(bot):
     print('Redeeming Keys for Bot:{}'.format(bot))
     if not appids:
-        print(translate('There are no ids in the list!', lang))
+        print('There are no ids in the list!')
         return
     for _ in appids:
         cur = database.cursor()
@@ -206,7 +175,7 @@ def redeemhead(bot):
             print('Game is already redeemed: {}'.format(_))
             logwrite('Game already redeemed: {}'.format(_))
         else:
-            print(translate('redeeming', lang) + ':  ' + _)
+            print('redeeming' + ':  ' + _)
             redeemkey(bot, _)
         cur.close()
 
@@ -231,7 +200,6 @@ def createbotprofile(bot):
 def querygames():
     for _ in config.links:
         pool.submit(getfreegames(_))
-
     cleanlist(appids)
 
     for _ in config.bot_names:

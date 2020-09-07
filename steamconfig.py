@@ -9,9 +9,6 @@ class config:
     boturl = 'http://127.0.0.1:1242/Api/Command/'
     botip = '127.0.0.1'
 
-    # By default the log output gets translated to the System Language
-    # Default: true
-    translateoutput = 'true'
     # Log Default: true
     log = 'true'
     # Logfile Default: freegames-log
