@@ -83,14 +83,14 @@ def cleanlist(appids):
 
 def getfreegames(s):
     url = s
-    from urllib3 import PoolManager
+    from urllib3 import PoolManager, exceptions
     from bs4 import BeautifulSoup
     import certifi
     try:
         https = PoolManager(ca_certs=certifi.where())
         response = https.request('GET', url, headers=config.headers).data.decode('utf-8')
         logwrite('Got url: {}'.format(url))
-    except:
+    except exceptions.ConnectionError:
         print('Cant connect to {}'.format(url))
         exit()
 
