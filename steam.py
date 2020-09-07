@@ -127,8 +127,7 @@ def redeemkey(bot, s):
     try:
         redeem = http.request('POST', config.boturl, body=dumps(data),
                               headers={'accept': 'application/json', 'Content-Type': 'application/json'},
-                              timeout=config.timeout).data.decode('utf-8')
-        print(redeem.status)
+                              timeout=config.timeout)
         answer = answerdata.format(s)
         if redeem.status == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
