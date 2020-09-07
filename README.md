@@ -52,7 +52,9 @@ log = 'true'
 # Logfile Default: freegames-log
 logfile = 'freegames.log'
 # Proxys are disabled by default
-proxy = 'disabled"'
+proxy = 'disabled'
+# Timeout for redeeming Keys: Default 2 Seconds
+timeout = 2
 ...
 ```
 
