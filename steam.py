@@ -155,7 +155,12 @@ def redeemkey(bot, s):
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
-    except ConnectionRefusedError:
+    except exceptions.MaxRetryError:
+        print(emessage.format(config.boturl))
+        logwrite(emessage.format(config.boturl))
+        answer = answerdata.format(s)
+        return answer
+    except exceptions.ConnectTimeoutError:
         print(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
