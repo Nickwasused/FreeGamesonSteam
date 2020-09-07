@@ -120,7 +120,7 @@ def returnappid(s):
 
 def redeemkey(bot, s):
     emessage = 'Cant connect to Archisteamfarm Api. {}'
-    from urllib3 import PoolManager
+    from urllib3 import PoolManager, exceptions
     from json import dumps
     http = PoolManager()
     data = {'Command': 'addlicense {} {}'.format(bot, s)}
@@ -128,6 +128,7 @@ def redeemkey(bot, s):
         redeem = http.request('POST', config.boturl, body=dumps(data),
                               headers={'accept': 'application/json', 'Content-Type': 'application/json'},
                               timeout=config.timeout).data.decode('utf-8')
+        print(redeem.status)
         answer = answerdata.format(s)
         if redeem.status == 200:
             database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
@@ -150,8 +151,13 @@ def redeemkey(bot, s):
             print('Cant Reddem code: {} on bot: {}'.format(bot, s))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
-    except:
-        print(emessage.format(config.boturl))
+    except exceptions.ConnectionError:
+        print(translate(emessage.format(config.boturl), lang))
+        logwrite(emessage.format(config.boturl))
+        answer = answerdata.format(s)
+        return answer
+    except ConnectionRefusedError:
+        print(translate(emessage.format(config.boturl), lang))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
