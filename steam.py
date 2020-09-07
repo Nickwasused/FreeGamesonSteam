@@ -85,8 +85,9 @@ def getfreegames(s):
     url = s
     from urllib3 import PoolManager
     from bs4 import BeautifulSoup
+    import certifi
     try:
-        https = PoolManager()
+        https = PoolManager(ca_certs=certifi.where())
         response = https.request('GET', url, headers=config.headers).data.decode('utf-8')
         logwrite('Got url: {}'.format(url))
     except:
@@ -122,9 +123,9 @@ def redeemkey(bot, s):
     from urllib3 import PoolManager
     from json import dumps
     http = PoolManager()
-    data = {'Command': 'addlicense {} {}'.format(bot, s)}
+    data = {'Command': 'addlicense {} {}'.format(bot, s)}.encode('utf-8')
     try:
-        redeem = http.request('POST', config.boturl, data=dumps(data),
+        redeem = http.request('POST', config.boturl, body=dumps(data),
                               headers={'accept': 'application/json', 'Content-Type': 'application/json'},
                               timeout=config.timeout).data.decode('utf-8')
         answer = answerdata.format(s)
