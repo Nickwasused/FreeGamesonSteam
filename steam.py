@@ -123,7 +123,7 @@ def redeemkey(bot, s):
     from urllib3 import PoolManager
     from json import dumps
     http = PoolManager()
-    data = {'Command': 'addlicense {} {}'.format(bot, s)}.encode('utf-8')
+    data = {'Command': 'addlicense {} {}'.format(bot, s)}
     try:
         redeem = http.request('POST', config.boturl, body=dumps(data),
                               headers={'accept': 'application/json', 'Content-Type': 'application/json'},
