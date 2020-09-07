@@ -151,12 +151,12 @@ def redeemkey(bot, s):
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
     except exceptions.ConnectionError:
-        print(translate(emessage.format(config.boturl), lang))
+        print(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
     except ConnectionRefusedError:
-        print(translate(emessage.format(config.boturl), lang))
+        print(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
