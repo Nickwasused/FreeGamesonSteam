@@ -3,9 +3,11 @@
 # Nickwasused
 
 import sys
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 if not sys.version_info > (3, 6):
-    print('You need to use Python 3.6 or above')
+    pp.pprint('You need to use Python 3.6 or above')
     exit()
 
 from steamconfig import config
@@ -65,11 +67,11 @@ import sqlite3
 database = sqlite3.connect(databasefile)
 
 if config.proxy == "enabled":
-    print('Using Proxy Server if available')
+    pp.pprint('Using Proxy Server if available')
     logwrite('Using Proxy Server if available')
 else:
     os.environ['NO_PROXY'] = config.botip
-    print('Not using Proxy Servers')
+    pp.pprint('Not using Proxy Servers')
     logwrite('Not using Proxy Servers')
 
 appids = []
@@ -91,7 +93,7 @@ def getfreegames(s):
         response = https.request('GET', url, headers=config.headers).data.decode('utf-8')
         logwrite('Got url: {}'.format(url))
     except exceptions.ConnectionError:
-        print('Cant connect to {}'.format(url))
+        pp.pprint('Cant connect to {}'.format(url))
         exit()
 
     soup = BeautifulSoup(response, 'html.parser')
@@ -135,52 +137,52 @@ def redeemkey(bot, s):
         elif redeem.status == 400:
             logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request))
         elif redeem.status == 401:
-            print('Wrong IPC password/auth faliure')
+            pp.pprint('Wrong IPC password/auth faliure')
             logwrite('Wrong IPC password/auth faliure')
         elif redeem.status == 403:
-            print('Blocked by asf try again in a few hours')
+            pp.pprint('Blocked by asf try again in a few hours')
             logwrite('Blocked by asf try again in a few hours')
         elif redeem.status == 500:
-            print('unexpected error while redeeming appid: {}'.format(s))
+            pp.pprint('unexpected error while redeeming appid: {}'.format(s))
             logwrite('unexpected error while redeeming appid: {}'.format(s))
         elif redeem.status == 503:
-            print('third-party resource error while redeeming appid: {}'.format(s))
+            pp.pprint('third-party resource error while redeeming appid: {}'.format(s))
             logwrite('third-party resource error while redeeming appid: {}'.format(s))
         else:
-            print('Cant Reddem code: {} on bot: {}'.format(bot, s))
+            pp.pprint('Cant Reddem code: {} on bot: {}'.format(bot, s))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
         return answer
     except exceptions.ConnectionError:
-        print(emessage.format(config.boturl))
+        pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
     except exceptions.MaxRetryError:
-        print(emessage.format(config.boturl))
+        pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
     except exceptions.ConnectTimeoutError:
-        print(emessage.format(config.boturl))
+        pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
         answer = answerdata.format(s)
         return answer
 
 
 def redeemhead(bot):
-    print('Redeeming Keys for Bot:{}'.format(bot))
+    pp.pprint('Redeeming Keys for Bot:{}'.format(bot))
     if not appids:
-        print('There are no ids in the list!')
+        pp.pprint('There are no ids in the list!')
         return
     for _ in appids:
         cur = database.cursor()
         cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, _))
         result = cur.fetchone()
         if result:
-            print('Game is already redeemed: {}'.format(_))
+            pp.pprint('Game is already redeemed: {}'.format(_))
             logwrite('Game already redeemed: {}'.format(_))
         else:
-            print('redeeming' + ':  ' + _)
+            pp.pprint('redeeming' + ':  ' + _)
             redeemkey(bot, _)
         cur.close()
 
