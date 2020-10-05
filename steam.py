@@ -174,8 +174,8 @@ def redeemhead(bot):
     if not appids:
         pp.pprint('There are no ids in the list!')
         return
+    cur = database.cursor()
     for _ in appids:
-        cur = database.cursor()
         cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, _))
         result = cur.fetchone()
         if result:
@@ -184,7 +184,7 @@ def redeemhead(bot):
         else:
             pp.pprint('redeeming' + ':  ' + _)
             redeemkey(bot, _)
-        cur.close()
+    cur.close()
 
 
 def createbotprofile(bot):
