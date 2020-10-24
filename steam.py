@@ -197,7 +197,7 @@ def createbotprofile(bot):
     else:
         try:
             database.execute('''CREATE TABLE "{}"
-                 (appids TEXT UNIQUE)'''.format(bot))
+                 (appids INTEGER UNIQUE)'''.format(bot))
             database.commit()
             logwrite('Created Database for Bot: {}'.format(bot))
         except sqlite3.OperationalError:
