@@ -90,7 +90,7 @@ timeout = 2
 	Description=Execute Steam
 
 	[Timer]
-	OnCalendar=*-*-* 0,6,12,18:00:00
+	OnCalendar=*-*-* 18:00:00
 	Unit=steam.service
 
 	[Install]
