@@ -4,6 +4,9 @@
 
 Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
 
+# Database Change!
+You need to remove your old database file (freegames.db)
+
 # Python Versions
 
 | Version | Supported          |
