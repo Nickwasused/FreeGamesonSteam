@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # Nickwasused
 
-import sys
 import pprint
+import sys
+
 pp = pprint.PrettyPrinter(indent=4)
 
 if not sys.version_info > (3, 6):
@@ -46,25 +47,18 @@ from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 
 pool = ThreadPoolExecutor(cpu_count())
-databaselocalfile = 'freegames.db'
 answerdata = 'success {}'
 success = 'success'
 
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-databasefile = os.path.join(BASE_DIR, databaselocalfile)
-logwrite('Database: {}'.format(databasefile))
 
 if os.path.exists(config.logfile):
     os.remove(config.logfile)
 else:
     # Nothing to remove
     pass
-
-import sqlite3
-
-database = sqlite3.connect(databasefile)
 
 if config.proxy == "enabled":
     pp.pprint('Using Proxy Server if available')
@@ -101,7 +95,7 @@ def getfreegames(s):
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, 'html.parser')
     from re import compile
-    appidfinder = compile('^[0-9]{6}$')
+    appidfinder = compile('^[0-9]{2,}$')
     link = compile('^/')
     for _ in soup.findAll('a', attrs={'href': link}):
         appid = returnappid(_.get('href'))
@@ -132,7 +126,6 @@ def redeemkey(bot, s):
                               timeout=config.timeout)
         answer = answerdata.format(s)
         if redeem.status == 200:
-            database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
             logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         elif redeem.status == 400:
             logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request))
@@ -169,39 +162,36 @@ def redeemkey(bot, s):
         return answer
 
 
+def testownership(bot, s):
+    from urllib3 import PoolManager
+    from json import dumps
+    http = PoolManager()
+    data = {'Command': 'owns {} {}'.format(bot, s)}
+    checkraw = http.request('POST', config.boturl, body=dumps(data),
+                            headers={'accept': 'application/json', 'Content-Type': 'application/json'},
+                            timeout=config.timeout)
+    message = checkraw.data.decode('utf-8')
+    messagelength = (len(message))
+    if messagelength > 100:
+        print(message)
+        return True
+    else:
+        return False
+
+
 def redeemhead(bot):
     pp.pprint('Redeeming Keys for Bot:{}'.format(bot))
     if not appids:
         pp.pprint('There are no ids in the list!')
         return
-    cur = database.cursor()
     for _ in appids:
-        cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, _))
-        result = cur.fetchone()
-        if result:
+        test = testownership(bot, _)
+        if test:
             pp.pprint('Game is already redeemed: {}'.format(_))
             logwrite('Game already redeemed: {}'.format(_))
         else:
             pp.pprint('redeeming' + ':  ' + _)
             redeemkey(bot, _)
-    cur.close()
-
-
-def createbotprofile(bot):
-    logwrite('Checking Database for: {}'.format(bot))
-    cur = database.cursor()
-    cur.execute(
-        'SELECT count(name) FROM sqlite_master WHERE type="table" AND name="{}"'.format(bot.replace('\'', '\'\'')))
-    if cur.fetchone()[0] == 1:
-        cur.close()
-    else:
-        try:
-            database.execute('''CREATE TABLE "{}"
-                 (appids INTEGER UNIQUE)'''.format(bot))
-            database.commit()
-            logwrite('Created Database for Bot: {}'.format(bot))
-        except sqlite3.OperationalError:
-            logwrite('Cant Create Database for: {}'.format(bot))
 
 
 def querygames():
@@ -210,16 +200,7 @@ def querygames():
     cleanlist(appids)
 
     for _ in config.bot_names:
-        createbotprofile(_)
         redeemhead(_)
-        database.commit()
-        logwrite('commited database')
 
 
 querygames()
-database.commit()
-logwrite('commited database')
-database.close()
-logwrite('database closed')
-logwrite('----------------------')
-logwrite_to_file()
