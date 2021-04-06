@@ -4,7 +4,10 @@
 
 import pprint
 import sys
-
+import json
+from urllib3 import PoolManager, exceptions
+from json import dumps
+http = PoolManager()
 pp = pprint.PrettyPrinter(indent=4)
 
 if not sys.version_info > (3, 6):
@@ -47,7 +50,6 @@ from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 
 pool = ThreadPoolExecutor(cpu_count())
-answerdata = 'success {}'
 success = 'success'
 
 import os
@@ -116,19 +118,21 @@ def returnappid(s):
 
 def redeemkey(bot, s):
     emessage = 'Cant connect to Archisteamfarm Api. {}'
-    from urllib3 import PoolManager, exceptions
-    from json import dumps
-    http = PoolManager()
     data = {'Command': 'addlicense {} {}'.format(bot, s)}
     try:
         redeem = http.request('POST', config.boturl, body=dumps(data),
                               headers={'accept': 'application/json', 'Content-Type': 'application/json'},
                               timeout=config.timeout)
-        answer = answerdata.format(s)
         if redeem.status == 200:
-            logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
+            if "Fail" in redeem.data.decode('utf-8'):
+                pp.pprint('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
+                logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
+            else:
+                pp.pprint('Redeemed appid: {} for bot: {}'.format(s, bot))
+                logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         elif redeem.status == 400:
-            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request))
+            pp.pprint('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
+            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
         elif redeem.status == 401:
             pp.pprint('Wrong IPC password/auth faliure')
             logwrite('Wrong IPC password/auth faliure')
@@ -144,54 +148,54 @@ def redeemkey(bot, s):
         else:
             pp.pprint('Cant Reddem code: {} on bot: {}'.format(bot, s))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
-        return answer
     except exceptions.ConnectionError:
         pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
-        answer = answerdata.format(s)
-        return answer
     except exceptions.MaxRetryError:
         pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
-        answer = answerdata.format(s)
-        return answer
     except exceptions.ConnectTimeoutError:
         pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
-        answer = answerdata.format(s)
-        return answer
+    except Exception as e:
+        print(redeem.status)
+        print(e)
+
+def getaccountgames(steamid):
+    accountappids = []
+    link = config.getsteamapilink(steamid)
+    games = http.request('GET', link)
+    text = games.data.decode('utf-8')
+    for _ in json.loads(text)["response"]["games"]:
+        accountappids.append(_["appid"])
+
+    return accountappids
 
 
-def testownership(bot, s):
-    from urllib3 import PoolManager
-    from json import dumps
-    http = PoolManager()
-    data = {'Command': 'owns {} {}'.format(bot, s)}
-    checkraw = http.request('POST', config.boturl, body=dumps(data),
-                            headers={'accept': 'application/json', 'Content-Type': 'application/json'},
-                            timeout=config.timeout)
-    message = checkraw.data.decode('utf-8')
-    messagelength = (len(message))
-    if messagelength > 100:
-        print(message)
-        return True
-    else:
-        return False
+
+def testownership(steamid, s):
+    games = getaccountgames(steamid)
+    for _ in games:
+        if s in str(_):
+            print("User has Game")
+            return True
+        else:
+            print("User dosent´s has Game")
+            return False
 
 
 def redeemhead(bot):
-    pp.pprint('Redeeming Keys for Bot:{}'.format(bot))
+    pp.pprint('Redeeming Keys for Bot: {}'.format(bot["name"]))
     if not appids:
         pp.pprint('There are no ids in the list!')
         return
     for _ in appids:
-        test = testownership(bot, _)
+        test = testownership(bot["steamid"], _)
         if test:
             pp.pprint('Game is already redeemed: {}'.format(_))
             logwrite('Game already redeemed: {}'.format(_))
         else:
-            pp.pprint('redeeming' + ':  ' + _)
-            redeemkey(bot, _)
+            redeemkey(bot["name"], _)
 
 
 def querygames():
@@ -199,7 +203,8 @@ def querygames():
         pool.submit(getfreegames(_))
     cleanlist(appids)
 
-    for _ in config.bot_names:
+    for _ in config.bots:
+        _ = y = json.loads(_)
         redeemhead(_)
 
 
