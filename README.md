@@ -7,6 +7,7 @@ Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm
 # Requirements
 
 * Steam Web Api Key [here](https://danbeyer.github.io/steamapi/page1.html)
+* Your SteamID64 [here](https://steamid.io/lookup/)
 
 # Python Versions
 
