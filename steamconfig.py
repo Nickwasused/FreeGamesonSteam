@@ -13,7 +13,7 @@ class config:
 
     boturl = 'http://127.0.0.1:1242/Api/Command/'
     botip = '127.0.0.1'
-    boturl = 'http://{}:1242/Api/Command/'.format(botip)
+    boturl = 'http://localhost:1242/Api/Command/'
 
     # Log Default: true
     log = 'true'
