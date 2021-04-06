@@ -12,6 +12,7 @@ Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm
 
 | Version | Supported          |
 | ------- | ------------------ |
+|   3.9   | :white_check_mark: |
 |   3.8   | :white_check_mark: |
 |   3.7   | :white_check_mark: |
 |   3.6   | :white_check_mark: |
@@ -53,7 +54,9 @@ log = 'true'
 # Logfile Default: freegames-log
 logfile = 'freegames.log'
 # Proxys are disabled by default
-proxy = 'disabled"'
+proxy = 'disabled'
+# Timeout for redeeming Keys: Default 2 Seconds
+timeout = 2
 ...
 ```
 
@@ -89,7 +92,7 @@ proxy = 'disabled"'
 	Description=Execute Steam
 
 	[Timer]
-	OnCalendar=*-*-* 0,6,12,18:00:00
+	OnCalendar=*-*-* 18:00:00
 	Unit=steam.service
 
 	[Install]

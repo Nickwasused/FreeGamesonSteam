@@ -1,5 +1,5 @@
 # Number of reviews required to mark the pull request as valid
-reviewsUntilReady: 1
+reviewsUntilReady: 0
 
 # Number of changes in the pull request to start enforcing the reviewsUntilReady rule
 changesThreshold: 100
