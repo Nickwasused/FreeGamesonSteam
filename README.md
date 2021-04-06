@@ -15,16 +15,15 @@ Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm
 |   3.9   | :white_check_mark: |
 |   3.8   | :white_check_mark: |
 |   3.7   | :white_check_mark: |
-|   3.6   | :white_check_mark: |
-| >=3.5   | :x:                |
+| >=3.6   | :x:                |
 
 # Cpu Architectures
 
 |   Arch  | Supported          |
 | ------- | ------------------ |
 |  AMD64  | :white_check_mark: |
-| ppc64le | :white_check_mark: |
-|  s390x  | :white_check_mark: |
+| ppc64le | :x:                |
+|  s390x  | :x:                |
 |  Arm64  | :white_check_mark: |
 |  Other  | :x:                |
 
