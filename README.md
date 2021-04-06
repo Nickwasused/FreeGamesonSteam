@@ -11,6 +11,7 @@ You need to remove your old database file (freegames.db)
 
 | Version | Supported          |
 | ------- | ------------------ |
+|   3.9   | :white_check_mark: |
 |   3.8   | :white_check_mark: |
 |   3.7   | :white_check_mark: |
 |   3.6   | :white_check_mark: |
