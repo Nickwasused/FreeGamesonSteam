@@ -2,8 +2,12 @@
 # -*- coding: utf-8 -*-
 # Nickwasused
 
-import sys
 import pprint
+import sys
+import json
+from urllib3 import PoolManager, exceptions
+from json import dumps
+http = PoolManager()
 pp = pprint.PrettyPrinter(indent=4)
 
 if not sys.version_info > (3, 6):
@@ -46,25 +50,17 @@ from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 
 pool = ThreadPoolExecutor(cpu_count())
-databaselocalfile = 'freegames.db'
-answerdata = 'success {}'
 success = 'success'
 
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-databasefile = os.path.join(BASE_DIR, databaselocalfile)
-logwrite('Database: {}'.format(databasefile))
 
 if os.path.exists(config.logfile):
     os.remove(config.logfile)
 else:
     # Nothing to remove
     pass
-
-import sqlite3
-
-database = sqlite3.connect(databasefile)
 
 if config.proxy == "enabled":
     pp.pprint('Using Proxy Server if available')
@@ -101,7 +97,7 @@ def getfreegames(s):
     text = '{}'.format(filterapps)
     soup = BeautifulSoup(text, 'html.parser')
     from re import compile
-    appidfinder = compile('^[0-9]{6}$')
+    appidfinder = compile('^[0-9]{2,}$')
     link = compile('^/')
     for _ in soup.findAll('a', attrs={'href': link}):
         appid = returnappid(_.get('href'))
@@ -122,20 +118,22 @@ def returnappid(s):
 
 def redeemkey(bot, s):
     emessage = 'Cant connect to Archisteamfarm Api. {}'
-    from urllib3 import PoolManager, exceptions
-    from json import dumps
-    http = PoolManager()
+    errormessage = 'Cant redeem appid: {} for bot: {}, because: "{}"'
     data = {'Command': 'addlicense {} {}'.format(bot, s)}
     try:
         redeem = http.request('POST', config.boturl, body=dumps(data),
                               headers={'accept': 'application/json', 'Content-Type': 'application/json'},
                               timeout=config.timeout)
-        answer = answerdata.format(s)
         if redeem.status == 200:
-            database.execute('INSERT INTO "{}" ("appids") VALUES ("{}")'.format(bot, s))
-            logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
+            if "Fail" in redeem.data.decode('utf-8'):
+                pp.pprint(errormessage.format(s, bot, redeem.data.decode('utf-8')))
+                logwrite(errormessage.format(s, bot, redeem.data.decode('utf-8')))
+            else:
+                pp.pprint('Redeemed appid: {} for bot: {}'.format(s, bot))
+                logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         elif redeem.status == 400:
-            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.request))
+            pp.pprint(errormessage.format(s, bot, redeem.data.decode('utf-8')))
+            logwrite(errormessage.format(s, bot, redeem.data.decode('utf-8')))
         elif redeem.status == 401:
             pp.pprint('Wrong IPC password/auth faliure')
             logwrite('Wrong IPC password/auth faliure')
@@ -151,57 +149,54 @@ def redeemkey(bot, s):
         else:
             pp.pprint('Cant Reddem code: {} on bot: {}'.format(bot, s))
             logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
-        return answer
     except exceptions.ConnectionError:
         pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
-        answer = answerdata.format(s)
-        return answer
     except exceptions.MaxRetryError:
         pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
-        answer = answerdata.format(s)
-        return answer
     except exceptions.ConnectTimeoutError:
         pp.pprint(emessage.format(config.boturl))
         logwrite(emessage.format(config.boturl))
-        answer = answerdata.format(s)
-        return answer
+    except Exception as e:
+        print(redeem.status)
+        print(e)
+
+def getaccountgames(steamid):
+    accountappids = []
+    link = config.getsteamapilink(steamid)
+    games = http.request('GET', link)
+    text = games.data.decode('utf-8')
+    for _ in json.loads(text)["response"]["games"]:
+        accountappids.append(_["appid"])
+
+    return accountappids
+
+
+
+def testownership(steamid, s):
+    games = getaccountgames(steamid)
+    for _ in games:
+        if s in str(_):
+            print("User has Game")
+            return True
+        else:
+            print("User dosent´s has Game")
+            return False
 
 
 def redeemhead(bot):
-    pp.pprint('Redeeming Keys for Bot:{}'.format(bot))
+    pp.pprint('Redeeming Keys for Bot: {} With Steamid: {}'.format(bot["name"], bot["steamid"]))
     if not appids:
         pp.pprint('There are no ids in the list!')
         return
-    cur = database.cursor()
     for _ in appids:
-        cur.execute('SELECT appids FROM "{}" WHERE appids="{}"'.format(bot, _))
-        result = cur.fetchone()
-        if result:
+        test = testownership(bot["steamid"], _)
+        if test:
             pp.pprint('Game is already redeemed: {}'.format(_))
             logwrite('Game already redeemed: {}'.format(_))
         else:
-            pp.pprint('redeeming' + ':  ' + _)
-            redeemkey(bot, _)
-    cur.close()
-
-
-def createbotprofile(bot):
-    logwrite('Checking Database for: {}'.format(bot))
-    cur = database.cursor()
-    cur.execute(
-        'SELECT count(name) FROM sqlite_master WHERE type="table" AND name="{}"'.format(bot.replace('\'', '\'\'')))
-    if cur.fetchone()[0] == 1:
-        cur.close()
-    else:
-        try:
-            database.execute('''CREATE TABLE "{}"
-                 (appids INTEGER UNIQUE)'''.format(bot))
-            database.commit()
-            logwrite('Created Database for Bot: {}'.format(bot))
-        except sqlite3.OperationalError:
-            logwrite('Cant Create Database for: {}'.format(bot))
+            redeemkey(bot["name"], _)
 
 
 def querygames():
@@ -209,17 +204,9 @@ def querygames():
         pool.submit(getfreegames(_))
     cleanlist(appids)
 
-    for _ in config.bot_names:
-        createbotprofile(_)
+    for _ in config.bots:
+        _ = json.loads(_)
         redeemhead(_)
-        database.commit()
-        logwrite('commited database')
 
 
 querygames()
-database.commit()
-logwrite('commited database')
-database.close()
-logwrite('database closed')
-logwrite('----------------------')
-logwrite_to_file()

@@ -4,8 +4,10 @@
 
 Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
 
-# Database Change!
-You need to remove your old database file (freegames.db)
+# Requirements
+
+* Steam Web Api Key [here](https://danbeyer.github.io/steamapi/page1.html)
+* Your SteamID64 [here](https://steamid.io/lookup/)
 
 # Python Versions
 
@@ -14,16 +16,15 @@ You need to remove your old database file (freegames.db)
 |   3.9   | :white_check_mark: |
 |   3.8   | :white_check_mark: |
 |   3.7   | :white_check_mark: |
-|   3.6   | :white_check_mark: |
-| >=3.5   | :x:                |
+| >=3.6   | :x:                |
 
 # Cpu Architectures
 
 |   Arch  | Supported          |
 | ------- | ------------------ |
 |  AMD64  | :white_check_mark: |
-| ppc64le | :white_check_mark: |
-|  s390x  | :white_check_mark: |
+| ppc64le | :x:                |
+|  s390x  | :x:                |
 |  Arm64  | :white_check_mark: |
 |  Other  | :x:                |
 
@@ -42,20 +43,30 @@ and
 You need to edit the Config file: ``` nano steamconfig.py ```
 ```
 ...
-# Config /Example for Bot (asf) bot_names = ["asf"]
-# !Important please change the Settings here!
-bot_names = ['PUT_YOU_BOT_NAME_HERE_1', 'PUT_YOU_BOT_NAME_HERE_2']
-boturl = 'http://127.0.0.1:1242/Api/Command/'
-botip = '127.0.0.1'
+    # Config /Example for Bot (asf) bot_names = ["asf"]
+    # !Important please change the Settings here!
+    bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}']
 
-# Log Default: true
-log = 'true'
-# Logfile Default: freegames-log
-logfile = 'freegames.log'
-# Proxys are disabled by default
-proxy = 'disabled'
-# Timeout for redeeming Keys: Default 2 Seconds
-timeout = 2
+    # e.g multiple bots
+    # bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}, {"name": "YOUR_BOT_NAME_2", "steamid": "YOUR_STEAM_ID_64_2"}']
+
+
+    boturl = 'http://127.0.0.1:1242/Api/Command/'
+    botip = '127.0.0.1'
+    boturl = 'http://{}:1242/Api/Command/'.format(botip)
+
+	# Log Default: true
+    log = 'true'
+    # Logfile Default: freegames-log
+    logfile = 'freegames.log'
+    # Proxys are disabled by default
+    proxy = 'disabled'
+    # Timeout for redeeming Keys: Default 2 Seconds
+    timeout = 2
+...
+	def getsteamapilink(self, steamid):
+        steam_api_key = "YOUR_STEAM_API_KEY"
+        return "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(steam_api_key, steamid)
 ...
 ```
 
@@ -108,7 +119,3 @@ timeout = 2
 
 The Service assumes that the Script is located here: ``` /home/pi/steambot/steam.py ``` <br>
 And the Service assumes that the Config is located here: ``` /home/pi/steambot/steamconfig.py ```
-
-# Example Database
-
-[Here](examples/example.md)

@@ -7,8 +7,6 @@ dist: xenial
 
 arch:
     - amd64
-    - ppc64le
-    - s390x
     - arm64
 
 cache: 
@@ -16,9 +14,9 @@ cache:
     - steamconfig.py
 
 python:
-    - "3.6"
     - "3.7"
     - "3.8"
+    - "3.9"
     - "nightly"
 
 jobs:
