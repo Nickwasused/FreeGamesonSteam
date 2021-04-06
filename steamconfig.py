@@ -28,7 +28,7 @@ class config:
     links = ['https://steamdb.info/sales/?min_discount=95&min_rating=0', 'https://steamdb.info/upcoming/free/#live-promotions']
     basesteam = 'https://store.steampowered.com/app/'
 
-    def getsteamapilink(steamid):
+    def getsteamapilink(self, steamid):
         steam_api_key = "YOUR_STEAM_API_KEY"
         return "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(steam_api_key, steamid)
 

@@ -118,6 +118,7 @@ def returnappid(s):
 
 def redeemkey(bot, s):
     emessage = 'Cant connect to Archisteamfarm Api. {}'
+    errormessage = 'Cant redeem appid: {} for bot: {}, because: "{}"'
     data = {'Command': 'addlicense {} {}'.format(bot, s)}
     try:
         redeem = http.request('POST', config.boturl, body=dumps(data),
@@ -125,14 +126,14 @@ def redeemkey(bot, s):
                               timeout=config.timeout)
         if redeem.status == 200:
             if "Fail" in redeem.data.decode('utf-8'):
-                pp.pprint('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
-                logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
+                pp.pprint(errormessage.format(s, bot, redeem.data.decode('utf-8')))
+                logwrite(errormessage.format(s, bot, redeem.data.decode('utf-8')))
             else:
                 pp.pprint('Redeemed appid: {} for bot: {}'.format(s, bot))
                 logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
         elif redeem.status == 400:
-            pp.pprint('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
-            logwrite('Cant redeem appid: {} for bot: {}, because: "{}"'.format(s, bot, redeem.data.decode('utf-8')))
+            pp.pprint(errormessage.format(s, bot, redeem.data.decode('utf-8')))
+            logwrite(errormessage.format(s, bot, redeem.data.decode('utf-8')))
         elif redeem.status == 401:
             pp.pprint('Wrong IPC password/auth faliure')
             logwrite('Wrong IPC password/auth faliure')
@@ -185,7 +186,7 @@ def testownership(steamid, s):
 
 
 def redeemhead(bot):
-    pp.pprint('Redeeming Keys for Bot: {}'.format(bot["name"]))
+    pp.pprint('Redeeming Keys for Bot: {} With Steamid: {}'.format(bot["name"], bot["steamid"]))
     if not appids:
         pp.pprint('There are no ids in the list!')
         return
@@ -204,7 +205,7 @@ def querygames():
     cleanlist(appids)
 
     for _ in config.bots:
-        _ = y = json.loads(_)
+        _ = json.loads(_)
         redeemhead(_)
 
 
