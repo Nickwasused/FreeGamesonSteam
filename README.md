@@ -43,20 +43,30 @@ and
 You need to edit the Config file: ``` nano steamconfig.py ```
 ```
 ...
-# Config /Example for Bot (asf) bot_names = ["asf"]
-# !Important please change the Settings here!
-bot_names = ['PUT_YOU_BOT_NAME_HERE_1', 'PUT_YOU_BOT_NAME_HERE_2']
-boturl = 'http://127.0.0.1:1242/Api/Command/'
-botip = '127.0.0.1'
+    # Config /Example for Bot (asf) bot_names = ["asf"]
+    # !Important please change the Settings here!
+    bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}']
 
-# Log Default: true
-log = 'true'
-# Logfile Default: freegames-log
-logfile = 'freegames.log'
-# Proxys are disabled by default
-proxy = 'disabled'
-# Timeout for redeeming Keys: Default 2 Seconds
-timeout = 2
+    # e.g multiple bots
+    # bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}, {"name": "YOUR_BOT_NAME_2", "steamid": "YOUR_STEAM_ID_64_2"}']
+
+
+    boturl = 'http://127.0.0.1:1242/Api/Command/'
+    botip = '127.0.0.1'
+    boturl = 'http://{}:1242/Api/Command/'.format(botip)
+
+	# Log Default: true
+    log = 'true'
+    # Logfile Default: freegames-log
+    logfile = 'freegames.log'
+    # Proxys are disabled by default
+    proxy = 'disabled'
+    # Timeout for redeeming Keys: Default 2 Seconds
+    timeout = 2
+...
+	def getsteamapilink(self, steamid):
+        steam_api_key = "YOUR_STEAM_API_KEY"
+        return "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(steam_api_key, steamid)
 ...
 ```
 
