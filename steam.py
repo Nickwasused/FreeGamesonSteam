@@ -207,6 +207,9 @@ def querygames():
     for _ in config.bots:
         _ = json.loads(_)
         redeemhead(_)
+        
+    logwrite_to_file()
 
 
 querygames()
+
