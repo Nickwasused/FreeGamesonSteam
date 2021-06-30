@@ -30,6 +30,9 @@ class config:
 
     def getsteamapilink(self, steamid):
         steam_api_key = "YOUR_STEAM_API_KEY"
+        if (steam_api_key == "YOUR_STEAM_API_KEY"):
+            print("Please edit the Config file!")
+            return
         return "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(steam_api_key, steamid)
 
     # You can change the User Agent here:

@@ -186,6 +186,11 @@ def testownership(steamid, s):
 
 
 def redeemhead(bot):
+    # Check for default Config
+    if (bot["steamid"] == "YOUR_STEAM_ID_64"):
+        pp.pprint('Please edit the Config file!')
+        return
+
     pp.pprint('Redeeming Keys for Bot: {} With Steamid: {}'.format(bot["name"], bot["steamid"]))
     if not appids:
         pp.pprint('There are no ids in the list!')
@@ -205,7 +210,12 @@ def querygames():
     cleanlist(appids)
 
     for _ in config.bots:
-        _ = json.loads(_)
+        try:
+            _ = json.loads(_)
+        except json.decoder.JSONDecodeError:
+            print("Your config seems to be broken!")
+            continue
+
         redeemhead(_)
         
     logwrite_to_file()
