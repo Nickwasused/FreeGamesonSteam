@@ -212,8 +212,8 @@ def querygames():
     for _ in config.bots:
         try:
             _ = json.loads(_)
-        except json.decoder.JSONDecodeError:
-            print("Your config seems to be broken!")
+        except json.decoder.JSONDecodeError as e:
+            print("Your config seems to be broken: {}".format(e))
             continue
 
         redeemhead(_)
