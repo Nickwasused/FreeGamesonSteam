@@ -209,13 +209,13 @@ def querygames():
         pool.submit(getfreegames(_))
     cleanlist(appids)
 
-    for _ in config.bots:
-        try:
-            _ = json.loads(_)
-        except json.decoder.JSONDecodeError as e:
-            print("Your config seems to be broken: {}".format(e))
-            continue
+    try:
+        bots = json.loads(config.bots)
+    except json.decoder.JSONDecodeError as e:
+        print("Your config seems to be broken: {}".format(e))
+        exit()
 
+    for _ in bots:
         redeemhead(_)
         
     logwrite_to_file()

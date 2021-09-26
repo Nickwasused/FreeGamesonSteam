@@ -3,12 +3,11 @@
 # Nickwasused
 
 class config:
-    # Config /Example for Bot (asf) bot_names = ["asf"]
     # !Important please change the Settings here!
-    bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}']
+    bots = '[{"name" : "YOUR_BOT_NAME", "steamid" : "YOUR_STEAM_ID_64"}]'
 
     # e.g multiple bots
-    # bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}, {"name": "YOUR_BOT_NAME_2", "steamid": "YOUR_STEAM_ID_64_2"}']
+    # bots = '[{"name" : "YOUR_BOT_NAME", "steamid" : "YOUR_STEAM_ID_64"}, {"name" : "YOUR_BOT_NAME", "steamid" : "YOUR_STEAM_ID_64"}]'
 
 
     boturl = 'http://127.0.0.1:1242/Api/Command/'
