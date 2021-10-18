@@ -4,6 +4,9 @@
 
 Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
 
+# Status
+Currently broken See: https://github.com/Nickwasused/FreeGamesonSteam/issues/41
+
 # Requirements
 
 * Steam Web Api Key [here](https://danbeyer.github.io/steamapi/page1.html)
