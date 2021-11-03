@@ -84,9 +84,15 @@ def getfreegames(s):
     from urllib3 import PoolManager, exceptions
     from bs4 import BeautifulSoup
     import certifi
+
     try:
         https = PoolManager(ca_certs=certifi.where())
-        response = https.request('GET', url, headers=config.headers).data.decode('utf-8')
+        encoded_body = json.dumps({
+            "cmd": "request.get",
+            "url": url,
+            "maxTimeout": config.proxytimeout
+        })
+        response = https.request('POST', config.proxyurl, headers=config.headers, body=encoded_body).data.decode('utf-8')
         logwrite('Got url: {}'.format(url))
     except exceptions.ConnectionError:
         pp.pprint('Cant connect to {}'.format(url))
