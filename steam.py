@@ -62,14 +62,6 @@ else:
     # Nothing to remove
     pass
 
-if config.proxy == "enabled":
-    pp.pprint('Using Proxy Server if available')
-    logwrite('Using Proxy Server if available')
-else:
-    os.environ['NO_PROXY'] = config.botip
-    pp.pprint('Not using Proxy Servers')
-    logwrite('Not using Proxy Servers')
-
 appids = []
 
 
