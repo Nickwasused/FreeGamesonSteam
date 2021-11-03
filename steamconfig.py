@@ -18,9 +18,8 @@ class config:
     log = 'true'
     # Logfile Default: freegames-log
     logfile = 'freegames.log'
-    # Proxys url (FlareSolverr)
-    proxyurl = '127.0.0.1:8191'
-    proxytimeout = 60000
+    # Proxys are disabled by default
+    proxy = 'disabled'
     # Timeout for redeeming Keys: Default 2 Seconds
     timeout = 2
 
@@ -35,6 +34,8 @@ class config:
             return
         return "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(steam_api_key, steamid)
 
+    # You can change the User Agent here:
+    # Default: Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail appname/appversion
     headers = {
-        'Content-Type': 'application/json'
+        'User-Agent': 'Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail appname/appversion'
     }
