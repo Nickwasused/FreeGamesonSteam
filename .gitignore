@@ -1,7 +1,6 @@
 #Nickwasused
 .idea
-freegames.db
-freegames.log
+steamconfig.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

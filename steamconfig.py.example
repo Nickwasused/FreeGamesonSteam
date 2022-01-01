@@ -6,9 +6,12 @@ class config:
     boturl = 'http://127.0.0.1:1242'
     botip = '127.0.0.1'
 
-    bots = ["main"]
+    bots = ["asf"]
+
+    # Example for multiple Bots
+    # bots = ["asf", "asf2", "asf3"]
 
     fetch_games_url = "https://store.steampowered.com/search/?specials=1&maxprice=free"
 
     # Get your Key here: https://steamcommunity.com/dev/apikey
-    steam_api_key = "EDAD6238F50B30682B5F531339EBCCCB"
+    steam_api_key = "YOUR STEAM API KEY"

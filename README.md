@@ -1,34 +1,21 @@
 # FreeGamesonSteam <br>
 [![Build Status](https://travis-ci.org/Nickwasused/FreeGamesonSteam.svg?branch=master)](https://travis-ci.org/Nickwasused/FreeGamesonSteam) 
 
-Searching SteamDB for Free Games and Activating them using  ArchiSteamFarm 
+Searching SteamDB for Free Games and Activating them using ArchiSteamFarm 
 
 # Status
-Currently broken See: https://github.com/Nickwasused/FreeGamesonSteam/issues/41
+A Workaround is being implemented.
+(Currently broken See: https://github.com/Nickwasused/FreeGamesonSteam/issues/41)
 
 # Requirements
 
-* Steam Web Api Key [here](https://danbeyer.github.io/steamapi/page1.html)
-* Your SteamID64 [here](https://steamid.io/lookup/)
+* Steam Web Api Key [here](https://steamcommunity.com/dev/apikey)
+* ArchiSteamFarm running with IPC Enabled
 
-# Python Versions
+# Info
 
-| Version | Supported          |
-| ------- | ------------------ |
-|   3.9   | :white_check_mark: |
-|   3.8   | :white_check_mark: |
-|   3.7   | :white_check_mark: |
-| >=3.6   | :x:                |
-
-# Cpu Architectures
-
-|   Arch  | Supported          |
-| ------- | ------------------ |
-|  AMD64  | :white_check_mark: |
-| ppc64le | :x:                |
-|  s390x  | :x:                |
-|  Arm64  | :white_check_mark: |
-|  Other  | :x:                |
+Python: 3.9<br>
+CPU-Tested: AMD64, ARM64
 
 # Important!
 You need to enable the IPC interface.
@@ -42,42 +29,26 @@ Put this in your ASF.json:
 
 and
 
-You need to edit the Config file: ``` nano steamconfig.py ```
+You need to edit the Config file: ```mv steamconfig.py.example steamconfig.py```<br>``` nano steamconfig.py ```
 ```
-...
-    # Config /Example for Bot (asf) bot_names = ["asf"]
-    # !Important please change the Settings here!
-    bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}']
-
-    # e.g multiple bots
-    # bots = ['{"name": "YOUR_BOT_NAME", "steamid": "YOUR_STEAM_ID_64"}, {"name": "YOUR_BOT_NAME_2", "steamid": "YOUR_STEAM_ID_64_2"}']
-
-
-    boturl = 'http://127.0.0.1:1242/Api/Command/'
+class config:
+    boturl = 'http://127.0.0.1:1242'
     botip = '127.0.0.1'
-    boturl = 'http://{}:1242/Api/Command/'.format(botip)
 
-	# Log Default: true
-    log = 'true'
-    # Logfile Default: freegames-log
-    logfile = 'freegames.log'
-    # Proxys are disabled by default
-    proxy = 'disabled'
-    # Timeout for redeeming Keys: Default 2 Seconds
-    timeout = 2
-...
-	def getsteamapilink(self, steamid):
-        steam_api_key = "YOUR_STEAM_API_KEY"
-        return "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(steam_api_key, steamid)
-...
+    bots = ["main"]
+
+    fetch_games_url = "https://store.steampowered.com/search/?specials=1&maxprice=free"
+
+    # Get your Key here: https://steamcommunity.com/dev/apikey
+    steam_api_key = "ADD YOUR STEAM API KEY HERE"
 ```
 
 # Setup for Raspberry-Pi
 
 1. You need ArchiSteamFarm running on ``` 127.0.0.1:1242 ```
-2. Make the Directory and change in it: ``` mkdir /home/pi/steambot && cd /home/pi/steambot ```
-3. Download the Script and Config: ``` wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steam.py && wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/steamconfig.py```
-4. Install Dependencies ```  wget https://raw.githubusercontent.com/Nickwasused/FreeGamesonSteam/master/requirements.txt &&  pip3 install -r requirements.txt ```
+2. Download the Script and Config: ```git clone git@github.com:Nickwasused/FreeGamesonSteam.git steam```
+3. Go into the Directory ```cd steam```
+4. Install Dependencies ```pip3 install -r requirements.txt```
 5. Create the Service and timer file:
 	- Path: ``` /etc/systemd/system/steam.service```
 	- Content : 
@@ -90,8 +61,8 @@ You need to edit the Config file: ``` nano steamconfig.py ```
 	[Service]
 	Type=simple
 	User=pi
-	ExecStart=/usr/bin/python3 /home/pi/steambot/steam.py
-	WorkingDirectory=/home/pi/steambot/
+	ExecStart=/usr/bin/python3 /home/pi/steam/steam.py
+	WorkingDirectory=/home/pi/steam/
 
 	[Install]
 	WantedBy=multi-user.target
@@ -119,5 +90,5 @@ You need to edit the Config file: ``` nano steamconfig.py ```
 
 # Notice
 
-The Service assumes that the Script is located here: ``` /home/pi/steambot/steam.py ``` <br>
-And the Service assumes that the Config is located here: ``` /home/pi/steambot/steamconfig.py ```
+The Service assumes that the Script is located here: ``` /home/pi/steam/steam.py ``` <br>
+And the Service assumes that the Config is located here: ``` /home/pi/steam/steamconfig.py ```

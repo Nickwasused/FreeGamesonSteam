@@ -1,225 +1,122 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Nickwasused
-
-import pprint
-import sys
-import json
-from urllib3 import PoolManager, exceptions
-from json import dumps
-http = PoolManager()
-pp = pprint.PrettyPrinter(indent=4)
-
-if not sys.version_info > (3, 6):
-    pp.pprint('You need to use Python 3.6 or above')
-    exit()
+# Nickwasused 2022
+# Python 3.9
 
 from steamconfig import config
 
+class account():
+    def __init__(self, steam_id):
+        from urllib3 import PoolManager
+        self.pool = PoolManager()
+        self.steam_api_key = config.steam_api_key
+        self.steam_id = steam_id
 
-def gettime():
-    from datetime import datetime
-    return datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    def get_games(self):
+        from json import loads
+        games = []
+        url = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={}&steamid={}&format=json".format(self.steam_api_key, self.steam_id)
+        response = self.pool.request('GET', url, preload_content=False)
+        response.release_conn()
 
+        apijson = loads(response.data)
+        for item in apijson["response"]["games"]:
+            games.append(item["appid"])
 
-logtemp = []
+        return games
 
+class gamefetcher:
+    def __init__(self):
+        from urllib3 import PoolManager
+        self.pool = PoolManager()
 
-def logwrite_true(_):
-    logtemp.append('[{}] {}{}'.format(gettime(), _, '\n'))
+    def getfreegames(self):
+        from json import loads
+        response = self.pool.request('GET', config.fetch_games_url, preload_content=False)
+        response.release_conn()
+        return response.data
 
+    def filtergames(self, text, games_owned):
+        from bs4 import BeautifulSoup
+        from re import compile
 
-def logwrite_to_file():
-    with open(config.logfile, 'a+') as logfile:
-        for _ in logtemp:
-            logfile.write(_)
-    logfile.close()
+        apps = []
 
+        soup = BeautifulSoup(text, 'html.parser')
+        links = soup.find_all("a", href=True)
+        regexraw = r"^https:\/\/store.steampowered.com\/app\/[0-9]{1,}"
+        regex = compile(regexraw)
+        for link in links:
+            result = regex.match(link["href"])
+            if (result != None):
+                app_id = result.group(0).replace("https://store.steampowered.com/app/", "")
+                if app_id not in games_owned:
+                    apps.append(app_id)
 
-def logwrite_false():
-    # Do not write log
-    pass
+        return apps
 
+class bot:
+    def __init__(self, name):
+        from urllib3 import PoolManager
+        self.pool = PoolManager()
+        self.name = name
+        self.steam_id = self.get_steam_id()
 
-if config.log == 'true':
-    logwrite = logwrite_true
-else:
-    logwrite = logwrite_false
+    def get_steam_id(self):
+        from json import loads
+        response = self.pool.request('GET', "{}/api/bot/{}".format(config.boturl, self.name), preload_content=False)
+        response.release_conn()
 
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import cpu_count
+        apijson = loads(response.data)
+        steam_id = apijson["Result"]["main"]["SteamID"]
+        return steam_id
 
-pool = ThreadPoolExecutor(cpu_count())
-success = 'success'
+    def redeem_games(self, games):
+        from urllib3 import exceptions
+        from json import dumps
+        error_message_api = 'Cant connect to Archisteamfarm Api. {}'
+        error_message_redeem = 'Cant redeem appid: {} for bot: {}, because: "{}"'
 
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-if os.path.exists(config.logfile):
-    os.remove(config.logfile)
-else:
-    # Nothing to remove
-    pass
-
-if config.proxy == "enabled":
-    pp.pprint('Using Proxy Server if available')
-    logwrite('Using Proxy Server if available')
-else:
-    os.environ['NO_PROXY'] = config.botip
-    pp.pprint('Not using Proxy Servers')
-    logwrite('Not using Proxy Servers')
-
-appids = []
-
-
-def cleanlist(appids):
-    appids = list(dict.fromkeys(appids))
-    logwrite('Cleaned appids')
-    return appids
-
-
-def getfreegames(s):
-    url = s
-    from urllib3 import PoolManager, exceptions
-    from bs4 import BeautifulSoup
-    import certifi
-    try:
-        https = PoolManager(ca_certs=certifi.where())
-        response = https.request('GET', url, headers=config.headers).data.decode('utf-8')
-        logwrite('Got url: {}'.format(url))
-    except exceptions.ConnectionError:
-        pp.pprint('Cant connect to {}'.format(url))
-        exit()
-
-    soup = BeautifulSoup(response, 'html.parser')
-    filterapps = soup.findAll('td')
-    text = '{}'.format(filterapps)
-    soup = BeautifulSoup(text, 'html.parser')
-    from re import compile
-    appidfinder = compile('^[0-9]{2,}$')
-    link = compile('^/')
-    for _ in soup.findAll('a', attrs={'href': link}):
-        appid = returnappid(_.get('href'))
-        appid = appidfinder.match(appid)
-        if appid:
-            appids.append(appid.string)
-        else:
-            break
-
-
-def returnappid(s):
-    templink = s.replace('/', '')
-    templink = templink.replace('sub', '')
-    appid = templink.replace('app', '')
-    logwrite('cleaned appid: {}'.format(appid))
-    return appid
-
-
-def redeemkey(bot, s):
-    emessage = 'Cant connect to Archisteamfarm Api. {}'
-    errormessage = 'Cant redeem appid: {} for bot: {}, because: "{}"'
-    data = {'Command': 'addlicense {} {}'.format(bot, s)}
-    try:
-        redeem = http.request('POST', config.boturl, body=dumps(data),
-                              headers={'accept': 'application/json', 'Content-Type': 'application/json'},
-                              timeout=config.timeout)
-        if redeem.status == 200:
-            if "Fail" in redeem.data.decode('utf-8'):
-                pp.pprint(errormessage.format(s, bot, redeem.data.decode('utf-8')))
-                logwrite(errormessage.format(s, bot, redeem.data.decode('utf-8')))
-            else:
-                pp.pprint('Redeemed appid: {} for bot: {}'.format(s, bot))
-                logwrite('Redeemed appid: {} for bot: {}'.format(s, bot))
-        elif redeem.status == 400:
-            pp.pprint(errormessage.format(s, bot, redeem.data.decode('utf-8')))
-            logwrite(errormessage.format(s, bot, redeem.data.decode('utf-8')))
-        elif redeem.status == 401:
-            pp.pprint('Wrong IPC password/auth faliure')
-            logwrite('Wrong IPC password/auth faliure')
-        elif redeem.status == 403:
-            pp.pprint('Blocked by asf try again in a few hours')
-            logwrite('Blocked by asf try again in a few hours')
-        elif redeem.status == 500:
-            pp.pprint('unexpected error while redeeming appid: {}'.format(s))
-            logwrite('unexpected error while redeeming appid: {}'.format(s))
-        elif redeem.status == 503:
-            pp.pprint('third-party resource error while redeeming appid: {}'.format(s))
-            logwrite('third-party resource error while redeeming appid: {}'.format(s))
-        else:
-            pp.pprint('Cant Reddem code: {} on bot: {}'.format(bot, s))
-            logwrite('Couldn´t Redeem appid: {} for bot: {}'.format(s, bot))
-    except exceptions.ConnectionError:
-        pp.pprint(emessage.format(config.boturl))
-        logwrite(emessage.format(config.boturl))
-    except exceptions.MaxRetryError:
-        pp.pprint(emessage.format(config.boturl))
-        logwrite(emessage.format(config.boturl))
-    except exceptions.ConnectTimeoutError:
-        pp.pprint(emessage.format(config.boturl))
-        logwrite(emessage.format(config.boturl))
-    except Exception as e:
-        print(redeem.status)
-        print(e)
-
-def getaccountgames(steamid):
-    accountappids = []
-    link = config.getsteamapilink(steamid)
-    games = http.request('GET', link)
-    text = games.data.decode('utf-8')
-    for _ in json.loads(text)["response"]["games"]:
-        accountappids.append(_["appid"])
-
-    return accountappids
-
-
-
-def testownership(steamid, s):
-    games = getaccountgames(steamid)
-    for _ in games:
-        if s in str(_):
-            print("User has Game")
-            return True
-        else:
-            print("User dosent´s has Game")
-            return False
-
-
-def redeemhead(bot):
-    # Check for default Config
-    if (bot["steamid"] == "YOUR_STEAM_ID_64"):
-        pp.pprint('Please edit the Config file!')
-        return
-
-    pp.pprint('Redeeming Keys for Bot: {} With Steamid: {}'.format(bot["name"], bot["steamid"]))
-    if not appids:
-        pp.pprint('There are no ids in the list!')
-        return
-    for _ in appids:
-        test = testownership(bot["steamid"], _)
-        if test:
-            pp.pprint('Game is already redeemed: {}'.format(_))
-            logwrite('Game already redeemed: {}'.format(_))
-        else:
-            redeemkey(bot["name"], _)
-
-
-def querygames():
-    for _ in config.links:
-        pool.submit(getfreegames(_))
-    cleanlist(appids)
-
-    try:
-        bots = json.loads(config.bots)
-    except json.decoder.JSONDecodeError as e:
-        print("Your config seems to be broken: {}".format(e))
-        exit()
-
-    for _ in bots:
-        redeemhead(_)
+        print("Trying to redeem {} Games.".format(len(games)))
         
-    logwrite_to_file()
+        for app_id in games:
+            try:
+                data = {'Command': 'addlicense {} {}'.format(self.name, app_id)}
+                print(data)
+                response = self.pool.request('POST', "{}/api/command".format(config.boturl), body=dumps(data), headers={'accept': 'application/json', 'Content-Type': 'application/json'}, timeout=30)
+                if response.status == 200:
+                    if "Fail" in response.data.decode('utf-8'):
+                        print(error_message_redeem.format(app_id, self.name, response.data.decode('utf-8')))
+                    else:
+                        print('Redeemed appid: {} for bot: {}'.format(app_id, self.name))
+                elif response.status == 400:
+                    print(error_message_redeem.format(app_id, self.name, response.data.decode('utf-8')))
+                elif response.status == 401:
+                    print('Wrong IPC password/auth faliure')
+                elif response.status == 403:
+                    print('Blocked by asf try again in a few hours')
+                elif response.status == 500:
+                    print('unexpected error while redeeming appid: {}'.format(app_id))
+                elif response.status == 503:
+                    print('third-party resource error while redeeming appid: {}'.format(app_id))
+                else:
+                    print('Cant Reddem code: {} on bot: {}'.format(self.name, app_id))
+            except exceptions.ConnectionError:
+                print(error_message_api.format(config.boturl))
+            except exceptions.MaxRetryError:
+                print(error_message_api.format(config.boturl))
+            except exceptions.ConnectTimeoutError:
+                print(error_message_api.format(config.boturl))
+            except Exception as e:
+                print(e)
 
+# fetch the Games here
+api = gamefetcher()
+new_games = api.getfreegames()
 
-querygames()
-
+for config_bot in config.bots:
+    bot = bot(config_bot)
+    accounthandler = account(bot.steam_id)
+    owned_games = accounthandler.get_games()
+    games_to_redeem = api.filtergames(new_games, owned_games)
+    bot.redeem_games(games_to_redeem)
