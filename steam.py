@@ -82,7 +82,6 @@ class bot:
         for app_id in games:
             try:
                 data = {'Command': 'addlicense {} {}'.format(self.name, app_id)}
-                print(data)
                 response = self.pool.request('POST', "{}/api/command".format(config.boturl), body=dumps(data), headers={'accept': 'application/json', 'Content-Type': 'application/json'}, timeout=30)
                 if response.status == 200:
                     if "Fail" in response.data.decode('utf-8'):
